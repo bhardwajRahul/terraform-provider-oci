@@ -39,6 +39,8 @@ resource "oci_database_autonomous_database" "test_autonomous_database" {
 		}
 
 		#Optional
+		availability_domain = var.autonomous_database_autonomous_database_maintenance_window_availability_domain
+		is_maintenance_window_change_scheduled = var.autonomous_database_autonomous_database_maintenance_window_is_maintenance_window_change_scheduled
 		maintenance_end_time = var.autonomous_database_autonomous_database_maintenance_window_maintenance_end_time
 		maintenance_start_time = var.autonomous_database_autonomous_database_maintenance_window_maintenance_start_time
 	}
@@ -174,9 +176,11 @@ The following arguments are supported:
 * `autonomous_database_backup_id` - (Required when source=BACKUP_FROM_ID) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the source Autonomous AI Database Backup that you will clone to create a new Autonomous AI Database.
 * `autonomous_database_id` - (Required when source=BACKUP_FROM_TIMESTAMP) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the source Autonomous AI Database that you will clone to create a new Autonomous AI Database.
 * `autonomous_maintenance_schedule_type` - (Optional) (Updatable) The maintenance schedule type of the Autonomous AI Database Serverless. An EARLY maintenance schedule follows a schedule applying patches prior to the REGULAR schedule. A REGULAR maintenance schedule follows the normal cycle 
-* `autonomous_database_maintenance_window` - (Optional) (Updatable) Autonomous Database maintenance window. The maintenance window can be configured during database creation. To change the maintenance window of an existing Autonomous Database Serverless instance, clone the database and specify the maintenance window for the new cloned instance. 
+* `autonomous_database_maintenance_window` - (Optional) (Updatable) Autonomous AI Database maintenance window. The maintenance window can be configured during database creation. To change the maintenance window of an existing Autonomous AI Database Serverless instance, clone the database and specify the maintenance window for the new cloned instance. 
+	* `availability_domain` - (Optional) (Updatable) The AD in which the maintenance will occur.
 	* `day_of_week` - (Required) (Updatable) Day of the week.
 		* `name` - (Required) (Updatable) Name of the day of the week.
+	* `is_maintenance_window_change_scheduled` - (Optional) (Updatable) Indicates if the maintenance window change is scheduled or not for the Autonomous AI Database.
 	* `maintenance_end_time` - (Optional) (Updatable) The maintenance end time. The value must use the ISO-8601 format "hh:mm".
 	* `maintenance_start_time` - (Optional) (Updatable) The maintenance start time. The value must use the ISO-8601 format "hh:mm".
 * `availability_domain` - (Optional) (Updatable) The Autonomous Database Serverless instance's availability domain.
@@ -383,13 +387,13 @@ The following attributes are exported:
 * `availability_domain` - The availability domain where the Autonomous AI Database Serverless instance is located.
 * `available_upgrade_versions` - List of Oracle AI Database versions available for a database upgrade. If there are no version upgrades available, this list is empty.
 * `backup_config` - Autonomous AI Database configuration details for storing [manual backups](https://docs.oracle.com/en/cloud/paas/autonomous-database/adbsa/backup-restore.html#GUID-9035DFB8-4702-4CEB-8281-C2A303820809) in the [Object Storage](https://docs.cloud.oracle.com/iaas/Content/Object/Concepts/objectstorageoverview.htm) service. 
-* `autonomous_database_maintenance_window` - Autonomous Database maintenance window. The maintenance window can be configured during database creation. To change the maintenance window of an existing Autonomous Database Serverless instance, clone the database and specify the maintenance window for the new cloned instance. 
+* `autonomous_database_maintenance_window` - Autonomous AI Database maintenance window. The maintenance window can be configured during database creation. To change the maintenance window of an existing Autonomous AI Database Serverless instance, clone the database and specify the maintenance window for the new cloned instance.
+    * `availability_domain` - The AD in which the maintenance will occur.
 	* `day_of_week` - Day of the week.
 		* `name` - Name of the day of the week.
+    * `is_maintenance_window_change_scheduled` - Indicates if the maintenance window change is scheduled or not for the Autonomous AI Database.
 	* `maintenance_end_time` - The maintenance end time. The value must use the ISO-8601 format "hh:mm".
 	* `maintenance_start_time` - The maintenance start time. The value must use the ISO-8601 format "hh:mm".
-	* `manual_backup_bucket_name` - Name of [Object Storage](https://docs.cloud.oracle.com/iaas/Content/Object/Concepts/objectstorageoverview.htm) bucket to use for storing manual backups.
-	* `manual_backup_type` - The manual backup destination type.
 * `backup_retention_period_in_days` - Retention period, in days, for long-term backups
 * `byol_compute_count_limit` - The maximum number of CPUs allowed with a Bring Your Own License (BYOL), including those used for auto-scaling, disaster recovery, tools, etc. Any CPU usage above this limit is considered as License Included and billed.
 * `character_set` - The character set for the Autonomous AI Database.  The default is AL32UTF8. Allowed values are:
@@ -635,6 +639,13 @@ The following attributes are exported:
 	* `pool_storage_size_in_tbs` - Resource pool storage size in TBs.
 	* `total_compute_capacity` - Resource Pool total capacity, it's currently 4x of pool size
 * `role` - The Data Guard role of the Autonomous Container Database or Autonomous AI Database, if Autonomous Data Guard is enabled. 
+* `scheduled_maintenance_window` - Autonomous AI Database maintenance window. The maintenance window can be configured during database creation. To change the maintenance window of an existing Autonomous AI Database Serverless instance, clone the database and specify the maintenance window for the new cloned instance. 
+	* `availability_domain` - The AD in which the maintenance will occur.
+	* `day_of_week` - Day of the week.
+		* `name` - Name of the day of the week.
+	* `is_maintenance_window_change_scheduled` - Indicates if the maintenance window change is scheduled or not for the Autonomous AI Database.
+	* `maintenance_end_time` - The maintenance end time. The value must use the ISO-8601 format "hh:mm".
+	* `maintenance_start_time` - The maintenance start time. The value must use the ISO-8601 format "hh:mm".
 * `scheduled_operations` - The list of scheduled operations. Consists of values such as dayOfWeek, scheduledStartTime, scheduledStopTime.
 
 	This cannot be updated in parallel with any of the following: licenseModel, dbEdition, cpuCoreCount, computeCount, computeModel, whitelistedIps, isMTLSConnectionRequired, openMode, permissionLevel, dbWorkload, privateEndpointLabel, nsgIds, dbVersion, isRefreshable, dbName, dbToolsDetails, isLocalDataGuardEnabled, or isFreeTier. 
@@ -697,6 +708,7 @@ The following attributes are exported:
 * `time_reclamation_of_free_autonomous_database` - The date and time the Always Free database will be stopped because of inactivity. If this time is reached without any database activity, the database will automatically be put into the STOPPED state. 
 * `time_scheduled_ad_update` - The date and time to which the Autonomous Database availability domain update is scheduled.
 * `time_scheduled_db_version_upgrade` - The date and time the Autonomous AI Database scheduled to upgrade to 26ai. 
+* `time_scheduled_maintenance_window_update` - The date and time at which operation to change Maintenance Window is scheduled to take place.
 * `time_undeleted` - The date and time the Autonomous AI Database was most recently undeleted.
 * `time_until_reconnect_clone_enabled` - The time and date as an RFC3339 formatted string, e.g., 2022-01-01T12:00:00.000Z, to set the limit for a refreshable clone to be reconnected to its source database.
 * `total_backup_storage_size_in_gbs` - The backup storage to the database.
