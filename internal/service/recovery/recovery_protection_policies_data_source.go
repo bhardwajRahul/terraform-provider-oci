@@ -20,10 +20,14 @@ func RecoveryProtectionPoliciesDataSource() *schema.Resource {
 			"filter": tfresource.DataSourceFiltersSchema(),
 			"compartment_id": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"display_name": {
 				Type:     schema.TypeString,
+				Optional: true,
+			},
+			"must_enforce_cloud_locality": {
+				Type:     schema.TypeBool,
 				Optional: true,
 			},
 			"owner": {
@@ -85,6 +89,11 @@ func (s *RecoveryProtectionPoliciesDataSourceCrud) Get() error {
 	if displayName, ok := s.D.GetOkExists("display_name"); ok {
 		tmp := displayName.(string)
 		request.DisplayName = &tmp
+	}
+
+	if mustEnforceCloudLocality, ok := s.D.GetOkExists("must_enforce_cloud_locality"); ok {
+		tmp := mustEnforceCloudLocality.(bool)
+		request.MustEnforceCloudLocality = &tmp
 	}
 
 	if owner, ok := s.D.GetOkExists("owner"); ok {

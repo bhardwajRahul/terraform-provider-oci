@@ -5,6 +5,7 @@ package recovery
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"strings"
 	"time"
@@ -67,6 +68,11 @@ func RecoveryRecoveryServiceSubnetResource() *schema.Resource {
 				Elem: &schema.Schema{
 					Type: schema.TypeString,
 				},
+			},
+			"security_attributes": {
+				Type:     schema.TypeString,
+				Optional: true,
+				Computed: true,
 			},
 			"subnet_id": {
 				Type:          schema.TypeString,
@@ -218,6 +224,14 @@ func (s *RecoveryRecoveryServiceSubnetResourceCrud) Create() error {
 		if len(tmp) != 0 || s.D.HasChange("nsg_ids") {
 			request.NsgIds = tmp
 		}
+	}
+
+	if securityAttributes, ok := s.D.GetOkExists("security_attributes"); ok {
+		result, err := expandRecoveryServiceSubnetSecurityAttributes(securityAttributes.(string))
+		if err != nil {
+			return err
+		}
+		request.SecurityAttributes = result
 	}
 
 	if subnetId, ok := s.D.GetOkExists("subnet_id"); ok {
@@ -438,6 +452,14 @@ func (s *RecoveryRecoveryServiceSubnetResourceCrud) Update() error {
 	tmp := s.D.Id()
 	request.RecoveryServiceSubnetId = &tmp
 
+	if securityAttributes, ok := s.D.GetOkExists("security_attributes"); ok {
+		result, err := expandRecoveryServiceSubnetSecurityAttributes(securityAttributes.(string))
+		if err != nil {
+			return err
+		}
+		request.SecurityAttributes = result
+	}
+
 	if subnets, ok := s.D.GetOkExists("subnets"); ok {
 		set := subnets.(*schema.Set)
 		interfaces := set.List()
@@ -508,6 +530,12 @@ func (s *RecoveryRecoveryServiceSubnetResourceCrud) SetData() error {
 	}
 	s.D.Set("nsg_ids", schema.NewSet(tfresource.LiteralTypeHashCodeForSets, nsgIds))
 
+	securityAttributes, err := flattenRecoveryServiceSubnetSecurityAttributes(s.Res.SecurityAttributes)
+	if err != nil {
+		return err
+	}
+	s.D.Set("security_attributes", securityAttributes)
+
 	s.D.Set("state", s.Res.LifecycleState)
 
 	if s.Res.SubnetId != nil {
@@ -574,6 +602,11 @@ func RecoveryServiceSubnetSummaryToMap(obj oci_recovery.RecoveryServiceSubnetSum
 		result["nsg_ids"] = schema.NewSet(tfresource.LiteralTypeHashCodeForSets, nsgIds)
 	}
 
+	securityAttributes, err := flattenRecoveryServiceSubnetSecurityAttributes(obj.SecurityAttributes)
+	if err == nil {
+		result["security_attributes"] = securityAttributes
+	}
+
 	result["state"] = string(obj.LifecycleState)
 
 	if obj.SubnetId != nil {
@@ -627,4 +660,30 @@ func (s *RecoveryRecoveryServiceSubnetResourceCrud) updateCompartment(compartmen
 
 	workId := response.OpcWorkRequestId
 	return s.getRecoveryServiceSubnetFromWorkRequest(workId, tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "recovery"), oci_recovery.ActionTypeUpdated, s.D.Timeout(schema.TimeoutUpdate))
+}
+
+func expandRecoveryServiceSubnetSecurityAttributes(input string) (map[string]map[string]interface{}, error) {
+	if input == "" {
+		return nil, nil
+	}
+
+	var result map[string]map[string]interface{}
+	if err := json.Unmarshal([]byte(input), &result); err != nil {
+		return nil, fmt.Errorf("invalid security_attributes JSON: %w", err)
+	}
+
+	return result, nil
+}
+
+func flattenRecoveryServiceSubnetSecurityAttributes(input map[string]map[string]interface{}) (string, error) {
+	if input == nil {
+		return "", nil
+	}
+
+	jsonBytes, err := json.Marshal(input)
+	if err != nil {
+		return "", fmt.Errorf("unable to marshal security_attributes to JSON: %w", err)
+	}
+
+	return string(jsonBytes), nil
 }

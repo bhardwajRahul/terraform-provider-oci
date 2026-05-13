@@ -36,12 +36,13 @@ var (
 	}
 
 	RecoveryProtectionPolicyDataSourceRepresentation = map[string]interface{}{
-		"compartment_id":       acctest.Representation{RepType: acctest.Required, Create: `${var.compartment_id}`},
-		"display_name":         acctest.Representation{RepType: acctest.Optional, Create: `displayName`, Update: `displayName2`},
-		"owner":                acctest.Representation{RepType: acctest.Optional, Create: `customer`},
-		"protection_policy_id": acctest.Representation{RepType: acctest.Optional, Create: `${oci_recovery_protection_policy.test_protection_policy.id}`},
-		"state":                acctest.Representation{RepType: acctest.Optional, Create: `ACTIVE`},
-		"filter":               acctest.RepresentationGroup{RepType: acctest.Required, Group: RecoveryProtectionPolicyDataSourceFilterRepresentation}}
+		"compartment_id":              acctest.Representation{RepType: acctest.Optional, Create: `${var.compartment_id}`},
+		"display_name":                acctest.Representation{RepType: acctest.Optional, Create: `displayName`, Update: `displayName2`},
+		"must_enforce_cloud_locality": acctest.Representation{RepType: acctest.Optional, Create: `false`},
+		"owner":                       acctest.Representation{RepType: acctest.Optional, Create: `customer`},
+		"protection_policy_id":        acctest.Representation{RepType: acctest.Optional, Create: `${oci_recovery_protection_policy.test_protection_policy.id}`},
+		"state":                       acctest.Representation{RepType: acctest.Optional, Create: `ACTIVE`},
+		"filter":                      acctest.RepresentationGroup{RepType: acctest.Required, Group: RecoveryProtectionPolicyDataSourceFilterRepresentation}}
 	RecoveryProtectionPolicyDataSourceFilterRepresentation = map[string]interface{}{
 		"name":   acctest.Representation{RepType: acctest.Required, Create: `id`},
 		"values": acctest.Representation{RepType: acctest.Required, Create: []string{`${oci_recovery_protection_policy.test_protection_policy.id}`}},
@@ -193,6 +194,7 @@ func TestRecoveryProtectionPolicyResource_basic(t *testing.T) {
 			Check: acctest.ComposeAggregateTestCheckFuncWrapper(
 				resource.TestCheckResourceAttr(datasourceName, "compartment_id", compartmentId),
 				resource.TestCheckResourceAttr(datasourceName, "display_name", "displayName2"),
+				resource.TestCheckResourceAttr(datasourceName, "must_enforce_cloud_locality", "false"),
 				resource.TestCheckResourceAttr(datasourceName, "owner", "customer"),
 				resource.TestCheckResourceAttrSet(datasourceName, "protection_policy_id"),
 				resource.TestCheckResourceAttr(datasourceName, "state", "ACTIVE"),

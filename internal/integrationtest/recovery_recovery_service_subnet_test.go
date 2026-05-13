@@ -36,7 +36,7 @@ var (
 	}
 
 	RecoveryRecoveryServiceSubnetDataSourceRepresentation = map[string]interface{}{
-		"compartment_id": acctest.Representation{RepType: acctest.Required, Create: `${var.compartment_id}`},
+		"compartment_id": acctest.Representation{RepType: acctest.Optional, Create: `${var.compartment_id}`},
 		"display_name":   acctest.Representation{RepType: acctest.Optional, Create: `displayName`, Update: `displayName2`},
 		"id":             acctest.Representation{RepType: acctest.Optional, Create: `${oci_recovery_recovery_service_subnet.test_recovery_service_subnet.id}`},
 		"state":          acctest.Representation{RepType: acctest.Optional, Create: `ACTIVE`},
@@ -54,8 +54,12 @@ var (
 		"defined_tags":   acctest.Representation{RepType: acctest.Optional, Create: `${map("${oci_identity_tag_namespace.tag-namespace1.name}.${oci_identity_tag.tag1.name}", "value")}`, Update: `${map("${oci_identity_tag_namespace.tag-namespace1.name}.${oci_identity_tag.tag1.name}", "updatedValue")}`},
 		"freeform_tags":  acctest.Representation{RepType: acctest.Optional, Create: map[string]string{"bar-key": "value"}, Update: map[string]string{"Department": "Accounting"}},
 		"nsg_ids":        acctest.Representation{RepType: acctest.Optional, Create: []string{}, Update: []string{`${oci_core_network_security_group.test_network_security_group.id}`}},
-		"subnets":        acctest.Representation{RepType: acctest.Required, Create: []string{`${oci_core_subnet.test_subnet.id}`}, Update: []string{`${oci_core_subnet.test_subnet.id}`, `${oci_core_subnet.test_subnet1.id}`}},
-		"lifecycle":      acctest.RepresentationGroup{RepType: acctest.Required, Group: recoveryIgnoreDefinedTagsRepresentation},
+		"security_attributes": acctest.Representation{
+			RepType: acctest.Optional,
+			Create:  `${jsonencode({"Oracle-ZPR" = {"MaxEgressCount" = {"value" = "42", "mode" = "enforce"}}})}`,
+		},
+		"subnets":   acctest.Representation{RepType: acctest.Required, Create: []string{`${oci_core_subnet.test_subnet.id}`}, Update: []string{`${oci_core_subnet.test_subnet.id}`, `${oci_core_subnet.test_subnet1.id}`}},
+		"lifecycle": acctest.RepresentationGroup{RepType: acctest.Required, Group: recoveryIgnoreDefinedTagsRepresentation},
 	}
 
 	RecoveryRecoveryServiceSubnetRepresentationForSubnetId = map[string]interface{}{
@@ -65,8 +69,12 @@ var (
 		"defined_tags":   acctest.Representation{RepType: acctest.Required, Create: `${map("${oci_identity_tag_namespace.tag-namespace1.name}.${oci_identity_tag.tag1.name}", "value")}`, Update: `${map("${oci_identity_tag_namespace.tag-namespace1.name}.${oci_identity_tag.tag1.name}", "updatedValue")}`},
 		"freeform_tags":  acctest.Representation{RepType: acctest.Optional, Create: map[string]string{"bar-key": "value"}, Update: map[string]string{"Department": "Accounting"}},
 		"nsg_ids":        acctest.Representation{RepType: acctest.Optional, Create: []string{}, Update: []string{`${oci_core_network_security_group.test_network_security_group.id}`}},
-		"subnet_id":      acctest.Representation{RepType: acctest.Required, Create: `${oci_core_subnet.test_subnet.id}`},
-		"lifecycle":      acctest.RepresentationGroup{RepType: acctest.Required, Group: recoveryIgnoreDefinedTagsRepresentation},
+		"security_attributes": acctest.Representation{
+			RepType: acctest.Optional,
+			Create:  `${jsonencode({"Oracle-ZPR" = {"MaxEgressCount" = {"value" = "42", "mode" = "enforce"}}})}`,
+		},
+		"subnet_id": acctest.Representation{RepType: acctest.Required, Create: `${oci_core_subnet.test_subnet.id}`},
+		"lifecycle": acctest.RepresentationGroup{RepType: acctest.Required, Group: recoveryIgnoreDefinedTagsRepresentation},
 	}
 
 	RecoveryRecoveryServiceSubnetResourceDependencies = acctest.GenerateResourceFromRepresentationMap("oci_core_subnet", "test_subnet", acctest.Required, acctest.Create, CoreSubnetRepresentation) +
@@ -129,6 +137,7 @@ func TestRecoveryRecoveryServiceSubnetResource_basic(t *testing.T) {
 				resource.TestCheckResourceAttr(resourceName, "display_name", "displayName"),
 				resource.TestCheckResourceAttr(resourceName, "freeform_tags.%", "1"),
 				resource.TestCheckResourceAttrSet(resourceName, "id"),
+				resource.TestCheckResourceAttr(resourceName, "security_attributes", `{"Oracle-ZPR":{"MaxEgressCount":{"mode":"enforce","value":"42"}}}`),
 				resource.TestCheckResourceAttr(resourceName, "nsg_ids.#", "0"),
 				resource.TestCheckResourceAttr(resourceName, "subnets.#", "1"),
 				resource.TestCheckResourceAttrSet(resourceName, "vcn_id"),
@@ -180,6 +189,7 @@ func TestRecoveryRecoveryServiceSubnetResource_basic(t *testing.T) {
 				resource.TestCheckResourceAttr(resourceName, "display_name", "displayName2"),
 				resource.TestCheckResourceAttr(resourceName, "freeform_tags.%", "1"),
 				resource.TestCheckResourceAttrSet(resourceName, "id"),
+				resource.TestCheckResourceAttr(resourceName, "security_attributes", `{"Oracle-ZPR":{"MaxEgressCount":{"mode":"enforce","value":"42"}}}`),
 				resource.TestCheckResourceAttr(resourceName, "nsg_ids.#", "1"),
 				resource.TestCheckResourceAttr(resourceName, "subnets.#", "2"),
 				resource.TestCheckResourceAttrSet(resourceName, "vcn_id"),
@@ -207,7 +217,6 @@ func TestRecoveryRecoveryServiceSubnetResource_basic(t *testing.T) {
 				resource.TestCheckResourceAttr(resourceName, "nsg_ids.#", "1"),
 				resource.TestCheckResourceAttr(resourceName, "subnets.#", "2"),
 				resource.TestCheckResourceAttrSet(datasourceName, "vcn_id"),
-
 				resource.TestCheckResourceAttr(datasourceName, "recovery_service_subnet_collection.#", "1"),
 				resource.TestCheckResourceAttr(datasourceName, "recovery_service_subnet_collection.0.items.#", "1"),
 			),
@@ -293,6 +302,7 @@ func TestRecoveryRecoveryServiceSubnetResourceWithSubnetId(t *testing.T) {
 				resource.TestCheckResourceAttr(resourceName, "display_name", "displayName"),
 				resource.TestCheckResourceAttr(resourceName, "freeform_tags.%", "1"),
 				resource.TestCheckResourceAttrSet(resourceName, "id"),
+				resource.TestCheckResourceAttr(resourceName, "security_attributes", `{"Oracle-ZPR":{"MaxEgressCount":{"mode":"enforce","value":"42"}}}`),
 				resource.TestCheckResourceAttrSet(resourceName, "subnet_id"),
 				resource.TestCheckResourceAttrSet(resourceName, "vcn_id"),
 
@@ -320,6 +330,7 @@ func TestRecoveryRecoveryServiceSubnetResourceWithSubnetId(t *testing.T) {
 				resource.TestCheckResourceAttr(resourceName, "display_name", "displayName"),
 				resource.TestCheckResourceAttr(resourceName, "freeform_tags.%", "1"),
 				resource.TestCheckResourceAttrSet(resourceName, "id"),
+				resource.TestCheckResourceAttr(resourceName, "security_attributes", `{"Oracle-ZPR":{"MaxEgressCount":{"mode":"enforce","value":"42"}}}`),
 				resource.TestCheckResourceAttrSet(resourceName, "subnet_id"),
 				resource.TestCheckResourceAttrSet(resourceName, "vcn_id"),
 
@@ -342,6 +353,7 @@ func TestRecoveryRecoveryServiceSubnetResourceWithSubnetId(t *testing.T) {
 				resource.TestCheckResourceAttr(resourceName, "display_name", "displayName2"),
 				resource.TestCheckResourceAttr(resourceName, "freeform_tags.%", "1"),
 				resource.TestCheckResourceAttrSet(resourceName, "id"),
+				resource.TestCheckResourceAttr(resourceName, "security_attributes", `{"Oracle-ZPR":{"MaxEgressCount":{"mode":"enforce","value":"42"}}}`),
 				resource.TestCheckResourceAttrSet(resourceName, "subnet_id"),
 				resource.TestCheckResourceAttrSet(resourceName, "vcn_id"),
 
@@ -383,6 +395,7 @@ func TestRecoveryRecoveryServiceSubnetResourceWithSubnetId(t *testing.T) {
 				resource.TestCheckResourceAttr(singularDatasourceName, "display_name", "displayName2"),
 				resource.TestCheckResourceAttr(singularDatasourceName, "freeform_tags.%", "1"),
 				resource.TestCheckResourceAttrSet(singularDatasourceName, "id"),
+				resource.TestCheckResourceAttr(singularDatasourceName, "security_attributes", `{"Oracle-ZPR":{"MaxEgressCount":{"mode":"enforce","value":"42"}}}`),
 				resource.TestCheckResourceAttrSet(singularDatasourceName, "state"),
 				resource.TestCheckResourceAttrSet(singularDatasourceName, "time_created"),
 				resource.TestCheckResourceAttrSet(singularDatasourceName, "time_updated"),
