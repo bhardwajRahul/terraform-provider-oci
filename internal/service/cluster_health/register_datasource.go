@@ -1,0 +1,11 @@
+// Copyright (c) 2017, 2024, Oracle and/or its affiliates. All rights reserved.
+// Licensed under the Mozilla Public License v2.0
+
+package cluster_health
+
+import "github.com/oracle/terraform-provider-oci/internal/tfresource"
+
+func RegisterDatasource() {
+	tfresource.RegisterDatasource("oci_cluster_health_diagnosis_store", ClusterHealthDiagnosisStoreDataSource())
+	tfresource.RegisterDatasource("oci_cluster_health_diagnosis_stores", ClusterHealthDiagnosisStoresDataSource())
+}
