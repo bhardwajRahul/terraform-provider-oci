@@ -18,6 +18,7 @@ import (
 	"github.com/oracle/terraform-provider-oci/internal/client"
 	"github.com/oracle/terraform-provider-oci/internal/tfresource"
 
+	"github.com/hashicorp/terraform-plugin-sdk/v2/diag"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/schema"
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/validation"
 
@@ -36,10 +37,10 @@ func CoreInstanceResource() *schema.Resource {
 			Update: tfresource.GetTimeoutDuration("45m"),
 			Delete: tfresource.GetTimeoutDuration("75m"),
 		},
-		Create: createCoreInstance,
-		Read:   readCoreInstance,
-		Update: updateCoreInstance,
-		Delete: deleteCoreInstance,
+		CreateContext: createCoreInstanceWithContext,
+		ReadContext:   readCoreInstanceWithContext,
+		UpdateContext: updateCoreInstanceWithContext,
+		DeleteContext: deleteCoreInstanceWithContext,
 		Schema: map[string]*schema.Schema{
 			// Required
 			"availability_domain": {
@@ -1073,7 +1074,7 @@ func CoreInstanceResource() *schema.Resource {
 	}
 }
 
-func createCoreInstance(d *schema.ResourceData, m interface{}) error {
+func createCoreInstanceWithContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	sync := &CoreInstanceResourceCrud{}
 	sync.D = d
 	sync.Client = m.(*client.OracleClients).ComputeClient()
@@ -1090,34 +1091,34 @@ func createCoreInstance(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if e := tfresource.CreateResourceUsingHybridPolling(sync); e != nil {
-		return e
+		return tfresource.HandleDiagError(m, e)
 	}
 
-	return powerOffIfNeeded(sync.D, sync, powerOff)
+	return tfresource.HandleDiagError(m, powerOffIfNeeded(ctx, sync.D, sync, powerOff))
 }
 
-func powerOffIfNeeded(d *schema.ResourceData, sync *CoreInstanceResourceCrud, powerOff bool) error {
+func powerOffIfNeeded(ctx context.Context, d *schema.ResourceData, sync *CoreInstanceResourceCrud, powerOff bool) error {
 
 	if powerOff {
-		if err := sync.InstanceAction(oci_core.InstanceActionActionStop, oci_core.InstanceLifecycleStateStopped); err != nil {
+		if err := sync.InstanceAction(ctx, oci_core.InstanceActionActionStop, oci_core.InstanceLifecycleStateStopped); err != nil {
 			return err
 		}
-		return tfresource.ReadResource(sync)
+		return tfresource.ReadResourceWithContext(ctx, sync)
 	}
 	return nil
 }
 
-func readCoreInstance(d *schema.ResourceData, m interface{}) error {
+func readCoreInstanceWithContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	sync := &CoreInstanceResourceCrud{}
 	sync.D = d
 	sync.Client = m.(*client.OracleClients).ComputeClient()
 	sync.VirtualNetworkClient = m.(*client.OracleClients).VirtualNetworkClient()
 	sync.BlockStorageClient = m.(*client.OracleClients).BlockstorageClient()
 
-	return tfresource.ReadResource(sync)
+	return tfresource.HandleDiagError(m, tfresource.ReadResourceWithContext(ctx, sync))
 }
 
-func updateCoreInstance(d *schema.ResourceData, m interface{}) error {
+func updateCoreInstanceWithContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	sync := &CoreInstanceResourceCrud{}
 	sync.D = d
 	sync.Client = m.(*client.OracleClients).ComputeClient()
@@ -1138,25 +1139,25 @@ func updateCoreInstance(d *schema.ResourceData, m interface{}) error {
 	}
 
 	if powerOn {
-		if err := sync.InstanceAction(oci_core.InstanceActionActionStart, oci_core.InstanceLifecycleStateRunning); err != nil {
-			return err
+		if err := sync.InstanceAction(ctx, oci_core.InstanceActionActionStart, oci_core.InstanceLifecycleStateRunning); err != nil {
+			return tfresource.HandleDiagError(m, err)
 		}
 		sync.D.Set("state", oci_core.InstanceLifecycleStateRunning)
 	}
-	if err := tfresource.UpdateResource(d, sync); err != nil {
-		return err
+	if err := tfresource.UpdateResourceWithContext(ctx, d, sync); err != nil {
+		return tfresource.HandleDiagError(m, err)
 	}
 	// switch to power off
 	if powerOff {
-		if err := sync.InstanceAction(oci_core.InstanceActionActionStop, oci_core.InstanceLifecycleStateStopped); err != nil {
-			return err
+		if err := sync.InstanceAction(ctx, oci_core.InstanceActionActionStop, oci_core.InstanceLifecycleStateStopped); err != nil {
+			return tfresource.HandleDiagError(m, err)
 		}
 		sync.D.Set("state", oci_core.InstanceLifecycleStateStopped)
 	}
 	return nil
 }
 
-func deleteCoreInstance(d *schema.ResourceData, m interface{}) error {
+func deleteCoreInstanceWithContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
 	sync := &CoreInstanceResourceCrud{}
 	sync.D = d
 	sync.Client = m.(*client.OracleClients).ComputeClient()
@@ -1165,7 +1166,7 @@ func deleteCoreInstance(d *schema.ResourceData, m interface{}) error {
 	sync.DisableNotFoundRetries = true
 	sync.WorkRequestClient = m.(*client.OracleClients).WorkRequestClient
 
-	return tfresource.DeleteResource(d, sync)
+	return tfresource.HandleDiagError(m, tfresource.DeleteResourceWithContext(ctx, d, sync))
 }
 
 type CoreInstanceResourceCrud struct {
@@ -1227,7 +1228,7 @@ func (s *CoreInstanceResourceCrud) DeletedTarget() []string {
 	}
 }
 
-func (s *CoreInstanceResourceCrud) Create() error {
+func (s *CoreInstanceResourceCrud) CreateWithContext(ctx context.Context) error {
 	request := oci_core.LaunchInstanceRequest{}
 
 	if agentConfig, ok := s.D.GetOkExists("agent_config"); ok {
@@ -1486,7 +1487,7 @@ func (s *CoreInstanceResourceCrud) Create() error {
 
 	request.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	response, err := s.Client.LaunchInstance(context.Background(), request)
+	response, err := s.Client.LaunchInstance(ctx, request)
 	if err != nil {
 		return err
 	}
@@ -1510,7 +1511,15 @@ func (s *CoreInstanceResourceCrud) Create() error {
 	return nil
 }
 
+func (s *CoreInstanceResourceCrud) Create() error {
+	return s.CreateWithContext(context.Background())
+}
+
 func (s *CoreInstanceResourceCrud) Get() error {
+	return s.GetWithContext(context.Background())
+}
+
+func (s *CoreInstanceResourceCrud) GetWithContext(ctx context.Context) error {
 	request := oci_core.GetInstanceRequest{}
 
 	tmp := s.D.Id()
@@ -1518,7 +1527,7 @@ func (s *CoreInstanceResourceCrud) Get() error {
 
 	request.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	response, err := s.Client.GetInstance(context.Background(), request)
+	response, err := s.Client.GetInstance(ctx, request)
 	if err != nil {
 		return err
 	}
@@ -1527,11 +1536,11 @@ func (s *CoreInstanceResourceCrud) Get() error {
 	return nil
 }
 
-func (s *CoreInstanceResourceCrud) Update() error {
+func (s *CoreInstanceResourceCrud) UpdateWithContext(ctx context.Context) error {
 	if compartment, ok := s.D.GetOkExists("compartment_id"); ok && s.D.HasChange("compartment_id") {
 		oldRaw, newRaw := s.D.GetChange("compartment_id")
 		if newRaw != "" && oldRaw != "" {
-			err := s.updateCompartment(compartment)
+			err := s.updateCompartment(ctx, compartment)
 			if err != nil {
 				return err
 			}
@@ -1542,12 +1551,12 @@ func (s *CoreInstanceResourceCrud) Update() error {
 	if sourceDetails, ok := s.D.GetOkExists("source_details"); ok && !s.D.HasChange(fmt.Sprintf(sourceDetailsFieldKeyFormat, "source_id")) {
 		if tmpList := sourceDetails.([]interface{}); len(tmpList) > 0 {
 			fieldKeyFormat := fmt.Sprintf("%s.%d.%%s", "source_details", 0)
-			err := s.mapToUpdateInstanceBootVolumeSizeInGbs(fieldKeyFormat)
+			err := s.mapToUpdateInstanceBootVolumeSizeInGbs(ctx, fieldKeyFormat)
 			if err != nil {
 				return err
 			}
 
-			err = s.mapToUpdateBootVolumeKmsKey(fieldKeyFormat)
+			err = s.mapToUpdateBootVolumeKmsKey(ctx, fieldKeyFormat)
 
 			if err != nil {
 				return err
@@ -1556,7 +1565,7 @@ func (s *CoreInstanceResourceCrud) Update() error {
 	}
 
 	// Update shape, shape config, platform config, source details, fault domain and launch options
-	err := s.updateOptionsViaWorkRequest()
+	err := s.updateOptionsViaWorkRequest(ctx)
 
 	if err != nil {
 		return err
@@ -1660,7 +1669,7 @@ func (s *CoreInstanceResourceCrud) Update() error {
 
 	request.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	response, err := s.Client.UpdateInstance(context.Background(), request)
+	response, err := s.Client.UpdateInstance(ctx, request)
 	if err != nil {
 		return err
 	}
@@ -1673,7 +1682,7 @@ func (s *CoreInstanceResourceCrud) Update() error {
 			tmp := s.D.Id()
 			securityAttributesRequest.InstanceId = &tmp
 			securityAttributesRequest.SecurityAttributes = tfresource.MapToSecurityAttributes(securityAttributes.(map[string]interface{}))
-			securityAttributesResponse, err := s.Client.UpdateInstance(context.Background(), securityAttributesRequest)
+			securityAttributesResponse, err := s.Client.UpdateInstance(ctx, securityAttributesRequest)
 			securityAttributeErrorMsgTemplate := `[ERROR] Failed to update Security Attributes: %q (Instance ID: "%v"`
 			if err != nil {
 				log.Printf(securityAttributeErrorMsgTemplate+`, desired Security Attributes: %q)`, err, s.Res.Id, securityAttributes)
@@ -1686,7 +1695,7 @@ func (s *CoreInstanceResourceCrud) Update() error {
 			}
 			if !areSecurityAttributesStable() {
 				log.Printf(`[DEBUG] Waiting for securityAttributesState to become [%s]`, oci_core.InstanceSecurityAttributesStateStable)
-				err := tfresource.WaitForResourceCondition(s, areSecurityAttributesStable, s.D.Timeout(schema.TimeoutUpdate))
+				err := tfresource.WaitForResourceConditionWithContext(ctx, s, areSecurityAttributesStable, s.D.Timeout(schema.TimeoutUpdate))
 				if err != nil {
 					log.Printf(securityAttributeErrorMsgTemplate+`, timed out waiting for Security Attributes to update)`, err, s.Res.Id)
 					return err
@@ -1702,14 +1711,14 @@ func (s *CoreInstanceResourceCrud) Update() error {
 		return nil
 	}
 
-	vnic, err := s.getPrimaryVnic()
+	vnic, err := s.getPrimaryVnic(ctx)
 	if err != nil {
 		log.Printf("[ERROR] Primary VNIC could not be found during instance Update: %q (Instance ID: \"%v\", State: %q)", err, s.Res.Id, s.Res.LifecycleState)
 		return err
 	}
 
 	fieldKeyFormat := fmt.Sprintf("%s.%d.%%s", "create_vnic_details", 0)
-	err = s.updateVnicAssignPublicIp(vnic, fieldKeyFormat)
+	err = s.updateVnicAssignPublicIp(ctx, vnic, fieldKeyFormat)
 	if err != nil {
 		return err
 	}
@@ -1727,7 +1736,7 @@ func (s *CoreInstanceResourceCrud) Update() error {
 		},
 	}
 
-	_, err = s.VirtualNetworkClient.UpdateVnic(context.Background(), vnicOpts)
+	_, err = s.VirtualNetworkClient.UpdateVnic(ctx, vnicOpts)
 
 	if err != nil {
 		log.Printf("[ERROR] Primary VNIC could not be updated during instance Update: %q (Instance ID: \"%v\", State: %q)", err, s.Res.Id, s.Res.LifecycleState)
@@ -1744,7 +1753,7 @@ func (s *CoreInstanceResourceCrud) Update() error {
 	return nil
 }
 
-func (s *CoreInstanceResourceCrud) InstanceAction(action oci_core.InstanceActionActionEnum, state oci_core.InstanceLifecycleStateEnum) error {
+func (s *CoreInstanceResourceCrud) InstanceAction(ctx context.Context, action oci_core.InstanceActionActionEnum, state oci_core.InstanceLifecycleStateEnum) error {
 	request := oci_core.InstanceActionRequest{}
 	request.Action = action
 
@@ -1753,17 +1762,17 @@ func (s *CoreInstanceResourceCrud) InstanceAction(action oci_core.InstanceAction
 
 	request.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	_, err := s.Client.InstanceAction(context.Background(), request)
+	_, err := s.Client.InstanceAction(ctx, request)
 	if err != nil {
 		return err
 	}
 
 	retentionPolicyFunc := func() bool { return s.Res.LifecycleState == state }
-	return tfresource.WaitForResourceCondition(s, retentionPolicyFunc, s.D.Timeout(schema.TimeoutUpdate))
+	return tfresource.WaitForResourceConditionWithContext(ctx, s, retentionPolicyFunc, s.D.Timeout(schema.TimeoutUpdate))
 
 }
 
-func (s *CoreInstanceResourceCrud) Delete() error {
+func (s *CoreInstanceResourceCrud) DeleteWithContext(ctx context.Context) error {
 	request := oci_core.TerminateInstanceRequest{}
 
 	tmp := s.D.Id()
@@ -1781,7 +1790,7 @@ func (s *CoreInstanceResourceCrud) Delete() error {
 
 	request.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	_, err := s.Client.TerminateInstance(context.Background(), request)
+	_, err := s.Client.TerminateInstance(ctx, request)
 	return err
 }
 
@@ -1924,7 +1933,7 @@ func (s *CoreInstanceResourceCrud) SetData() error {
 		s.D.Set("shape_config", []interface{}{})
 	}
 
-	bootVolume, bootVolumeErr := s.getBootVolume()
+	bootVolume, bootVolumeErr := s.getBootVolume(context.Background())
 	if bootVolumeErr != nil {
 		log.Printf("[WARN] Could not get the boot volume: %q", bootVolumeErr)
 	}
@@ -1973,7 +1982,7 @@ func (s *CoreInstanceResourceCrud) SetData() error {
 	if s.Res.LifecycleState != oci_core.InstanceLifecycleStateTerminated &&
 		s.Res.LifecycleState != oci_core.InstanceLifecycleStateProvisioning &&
 		s.Res.LifecycleState != oci_core.InstanceLifecycleStateTerminating {
-		vnic, vnicError := s.getPrimaryVnic()
+		vnic, vnicError := s.getPrimaryVnic(context.Background())
 		if vnicError != nil || vnic == nil {
 			log.Printf("[WARN] Primary VNIC could not be found during instance refresh: %q", vnicError)
 		} else {
@@ -2284,7 +2293,7 @@ func InstanceOptionsToMap(obj *oci_core.InstanceOptions) map[string]interface{} 
 	return result
 }
 
-func (s *CoreInstanceResourceCrud) updateVnicAssignPublicIp(vnic *oci_core.Vnic, fieldKeyFormat string) error {
+func (s *CoreInstanceResourceCrud) updateVnicAssignPublicIp(ctx context.Context, vnic *oci_core.Vnic, fieldKeyFormat string) error {
 
 	if assignPublicIp, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "assign_public_ip")); ok && s.D.HasChange(fmt.Sprintf(fieldKeyFormat, "assign_public_ip")) {
 
@@ -2296,7 +2305,7 @@ func (s *CoreInstanceResourceCrud) updateVnicAssignPublicIp(vnic *oci_core.Vnic,
 
 		if assignPublicIpBoolVal {
 
-			listPrivateIpsResponse, err := s.VirtualNetworkClient.ListPrivateIps(context.Background(), oci_core.ListPrivateIpsRequest{
+			listPrivateIpsResponse, err := s.VirtualNetworkClient.ListPrivateIps(ctx, oci_core.ListPrivateIpsRequest{
 				VnicId: vnic.Id,
 				RequestMetadata: common.RequestMetadata{
 					RetryPolicy: tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core"),
@@ -2309,7 +2318,7 @@ func (s *CoreInstanceResourceCrud) updateVnicAssignPublicIp(vnic *oci_core.Vnic,
 
 			for _, privateIp := range listPrivateIpsResponse.Items {
 				if strings.EqualFold(*privateIp.IpAddress, *vnic.PrivateIp) {
-					_, err = s.VirtualNetworkClient.CreatePublicIp(context.Background(), oci_core.CreatePublicIpRequest{
+					_, err = s.VirtualNetworkClient.CreatePublicIp(ctx, oci_core.CreatePublicIpRequest{
 						CreatePublicIpDetails: oci_core.CreatePublicIpDetails{
 							CompartmentId: vnic.CompartmentId,
 							Lifetime:      oci_core.CreatePublicIpDetailsLifetimeEphemeral,
@@ -2326,7 +2335,7 @@ func (s *CoreInstanceResourceCrud) updateVnicAssignPublicIp(vnic *oci_core.Vnic,
 			return fmt.Errorf("unable to assign Ephemeral public ip for the vnic private ip: %s", *vnic.PrivateIp)
 
 		} else {
-			publicIpByIpAddressResponse, err := s.VirtualNetworkClient.GetPublicIpByIpAddress(context.Background(), oci_core.GetPublicIpByIpAddressRequest{
+			publicIpByIpAddressResponse, err := s.VirtualNetworkClient.GetPublicIpByIpAddress(ctx, oci_core.GetPublicIpByIpAddressRequest{
 				GetPublicIpByIpAddressDetails: oci_core.GetPublicIpByIpAddressDetails{
 					IpAddress: vnic.PublicIp,
 				},
@@ -2336,7 +2345,7 @@ func (s *CoreInstanceResourceCrud) updateVnicAssignPublicIp(vnic *oci_core.Vnic,
 			})
 
 			if err == nil {
-				_, err = s.VirtualNetworkClient.DeletePublicIp(context.Background(), oci_core.DeletePublicIpRequest{
+				_, err = s.VirtualNetworkClient.DeletePublicIp(ctx, oci_core.DeletePublicIpRequest{
 					PublicIpId: publicIpByIpAddressResponse.Id,
 					RequestMetadata: common.RequestMetadata{
 						RetryPolicy: tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core"),
@@ -3938,7 +3947,7 @@ func mapToExtendedMetadata(rm map[string]interface{}) (map[string]interface{}, e
 	return result, nil
 }
 
-func (s *CoreInstanceResourceCrud) getPrimaryVnic() (*oci_core.Vnic, error) {
+func (s *CoreInstanceResourceCrud) getPrimaryVnic(ctx context.Context) (*oci_core.Vnic, error) {
 	request := oci_core.ListVnicAttachmentsRequest{
 		CompartmentId: s.Res.CompartmentId,
 		InstanceId:    s.Res.Id,
@@ -3949,7 +3958,7 @@ func (s *CoreInstanceResourceCrud) getPrimaryVnic() (*oci_core.Vnic, error) {
 	var attachments []oci_core.VnicAttachment
 
 	for {
-		result, err := s.Client.ListVnicAttachments(context.Background(), request)
+		result, err := s.Client.ListVnicAttachments(ctx, request)
 		if err != nil {
 			return nil, err
 		}
@@ -3974,7 +3983,7 @@ func (s *CoreInstanceResourceCrud) getPrimaryVnic() (*oci_core.Vnic, error) {
 					RetryPolicy: tfresource.GetRetryPolicy(true, "core"),
 				},
 			}
-			response, _ := s.VirtualNetworkClient.GetVnic(context.Background(), request)
+			response, _ := s.VirtualNetworkClient.GetVnic(ctx, request)
 			vnic := &response.Vnic
 
 			// Ignore errors on GetVnic, since we might not have permissions to view some secondary VNICs.
@@ -4018,7 +4027,7 @@ func (s *CoreInstanceResourceCrud) mapToPlacementConstraintDetails(fieldKeyForma
 	return baseObject, nil
 }
 
-func (s *CoreInstanceResourceCrud) getBootVolume() (*oci_core.BootVolume, error) {
+func (s *CoreInstanceResourceCrud) getBootVolume(ctx context.Context) (*oci_core.BootVolume, error) {
 	request := oci_core.ListBootVolumeAttachmentsRequest{
 		AvailabilityDomain: s.Res.AvailabilityDomain,
 		CompartmentId:      s.Res.CompartmentId,
@@ -4028,7 +4037,7 @@ func (s *CoreInstanceResourceCrud) getBootVolume() (*oci_core.BootVolume, error)
 		},
 	}
 
-	response, err := s.Client.ListBootVolumeAttachments(context.Background(), request)
+	response, err := s.Client.ListBootVolumeAttachments(ctx, request)
 	if err != nil {
 		return nil, err
 	}
@@ -4048,7 +4057,7 @@ func (s *CoreInstanceResourceCrud) getBootVolume() (*oci_core.BootVolume, error)
 			RetryPolicy: tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core"),
 		},
 	}
-	bootVolumeResponse, err := s.BlockStorageClient.GetBootVolume(context.Background(), bootVolumeRequest)
+	bootVolumeResponse, err := s.BlockStorageClient.GetBootVolume(ctx, bootVolumeRequest)
 	if err != nil {
 		return nil, err
 	}
@@ -4128,7 +4137,7 @@ func PreemptionActionToMap(obj *oci_core.PreemptionAction) map[string]interface{
 	return result
 }
 
-func (s *CoreInstanceResourceCrud) updateCompartment(compartment interface{}) error {
+func (s *CoreInstanceResourceCrud) updateCompartment(ctx context.Context, compartment interface{}) error {
 	changeCompartmentRequest := oci_core.ChangeInstanceCompartmentRequest{}
 
 	compartmentTmp := compartment.(string)
@@ -4139,21 +4148,21 @@ func (s *CoreInstanceResourceCrud) updateCompartment(compartment interface{}) er
 
 	changeCompartmentRequest.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	_, err := s.Client.ChangeInstanceCompartment(context.Background(), changeCompartmentRequest)
+	_, err := s.Client.ChangeInstanceCompartment(ctx, changeCompartmentRequest)
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *CoreInstanceResourceCrud) mapToUpdateInstanceBootVolumeSizeInGbs(fieldKeyFormat string) error {
+func (s *CoreInstanceResourceCrud) mapToUpdateInstanceBootVolumeSizeInGbs(ctx context.Context, fieldKeyFormat string) error {
 	if bootVolumeSizeInGBs, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "boot_volume_size_in_gbs")); ok && s.D.HasChange(fmt.Sprintf(fieldKeyFormat, "boot_volume_size_in_gbs")) {
 		tmp := bootVolumeSizeInGBs.(string)
 		tmpInt64, err := strconv.ParseInt(tmp, 10, 64)
 		if err != nil {
 			return fmt.Errorf("unable to convert bootVolumeSizeInGBs string: %s to an int64 and encountered error: %v", tmp, err)
 		}
-		err = s.updateBootVolumeSizeInGbs(tmpInt64)
+		err = s.updateBootVolumeSizeInGbs(ctx, tmpInt64)
 		if err != nil {
 			return err
 		}
@@ -4161,10 +4170,10 @@ func (s *CoreInstanceResourceCrud) mapToUpdateInstanceBootVolumeSizeInGbs(fieldK
 	return nil
 }
 
-func (s *CoreInstanceResourceCrud) mapToUpdateBootVolumeKmsKey(fieldKeyFormat string) error {
+func (s *CoreInstanceResourceCrud) mapToUpdateBootVolumeKmsKey(ctx context.Context, fieldKeyFormat string) error {
 	if kmsKeyId, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "kms_key_id")); ok && s.D.HasChange(fmt.Sprintf(fieldKeyFormat, "kms_key_id")) {
 		tmp := kmsKeyId.(string)
-		err := s.updateBootVolumeKmsKey(tmp)
+		err := s.updateBootVolumeKmsKey(ctx, tmp)
 		if err != nil {
 			return err
 		}
@@ -4172,7 +4181,7 @@ func (s *CoreInstanceResourceCrud) mapToUpdateBootVolumeKmsKey(fieldKeyFormat st
 	return nil
 }
 
-func (s *CoreInstanceResourceCrud) updateBootVolumeKmsKey(kmsKeyId interface{}) error {
+func (s *CoreInstanceResourceCrud) updateBootVolumeKmsKey(ctx context.Context, kmsKeyId interface{}) error {
 	updateBootVolumeKmsKeyRequest := oci_core.UpdateBootVolumeKmsKeyRequest{}
 
 	if bootVolumeId, ok := s.D.GetOkExists("boot_volume_id"); ok {
@@ -4185,19 +4194,19 @@ func (s *CoreInstanceResourceCrud) updateBootVolumeKmsKey(kmsKeyId interface{}) 
 
 	updateBootVolumeKmsKeyRequest.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	_, err := s.BlockStorageClient.UpdateBootVolumeKmsKey(context.Background(), updateBootVolumeKmsKeyRequest)
+	_, err := s.BlockStorageClient.UpdateBootVolumeKmsKey(ctx, updateBootVolumeKmsKeyRequest)
 	if err != nil {
 		return err
 	}
 
-	_, err = waitForBootVolumeIfItIsUpdating(updateBootVolumeKmsKeyRequest.BootVolumeId, s.BlockStorageClient, s.D.Timeout(schema.TimeoutUpdate))
+	_, err = waitForBootVolumeIfItIsUpdating(ctx, updateBootVolumeKmsKeyRequest.BootVolumeId, s.BlockStorageClient, s.D.Timeout(schema.TimeoutUpdate))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func (s *CoreInstanceResourceCrud) updateBootVolumeSizeInGbs(bootVolumeSizeInGBs interface{}) error {
+func (s *CoreInstanceResourceCrud) updateBootVolumeSizeInGbs(ctx context.Context, bootVolumeSizeInGBs interface{}) error {
 	changeBootVolumeDetailsRequest := oci_core.UpdateBootVolumeRequest{}
 
 	if bootVolumeId, ok := s.D.GetOkExists("boot_volume_id"); ok {
@@ -4210,19 +4219,19 @@ func (s *CoreInstanceResourceCrud) updateBootVolumeSizeInGbs(bootVolumeSizeInGBs
 
 	changeBootVolumeDetailsRequest.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	response, err := s.BlockStorageClient.UpdateBootVolume(context.Background(), changeBootVolumeDetailsRequest)
+	response, err := s.BlockStorageClient.UpdateBootVolume(ctx, changeBootVolumeDetailsRequest)
 	if err != nil {
 		return err
 	}
 
-	_, err = waitForBootVolumeIfItIsUpdating(response.Id, s.BlockStorageClient, s.D.Timeout(schema.TimeoutUpdate))
+	_, err = waitForBootVolumeIfItIsUpdating(ctx, response.Id, s.BlockStorageClient, s.D.Timeout(schema.TimeoutUpdate))
 	if err != nil {
 		return err
 	}
 	return nil
 }
 
-func waitForBootVolumeIfItIsUpdating(bootVolumeID *string, client *oci_core.BlockstorageClient, timeout time.Duration) (*oci_core.GetBootVolumeResponse, error) {
+func waitForBootVolumeIfItIsUpdating(ctx context.Context, bootVolumeID *string, client *oci_core.BlockstorageClient, timeout time.Duration) (*oci_core.GetBootVolumeResponse, error) {
 	getBootVolumeRequest := oci_core.GetBootVolumeRequest{}
 
 	getBootVolumeRequest.BootVolumeId = bootVolumeID
@@ -4237,11 +4246,11 @@ func waitForBootVolumeIfItIsUpdating(bootVolumeID *string, client *oci_core.Bloc
 	}
 
 	getBootVolumeRequest.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicyWithAdditionalRetryCondition(timeout, bootVolumeUpdating, "core")
-	getBootVolumeResponse, err := client.GetBootVolume(context.Background(), getBootVolumeRequest)
+	getBootVolumeResponse, err := client.GetBootVolume(ctx, getBootVolumeRequest)
 	return &getBootVolumeResponse, err
 }
 
-func (s *CoreInstanceResourceCrud) updateOptionsViaWorkRequest() error {
+func (s *CoreInstanceResourceCrud) updateOptionsViaWorkRequest(ctx context.Context) error {
 	request := oci_core.UpdateInstanceRequest{}
 
 	if faultDomain, ok := s.D.GetOkExists("fault_domain"); ok && s.D.HasChange("fault_domain") {
@@ -4333,12 +4342,12 @@ func (s *CoreInstanceResourceCrud) updateOptionsViaWorkRequest() error {
 
 	request.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(s.DisableNotFoundRetries, "core")
 
-	response, err := s.Client.UpdateInstance(context.Background(), request)
+	response, err := s.Client.UpdateInstance(ctx, request)
 	if err != nil {
 		return err
 	}
 	workId := response.OpcWorkRequestId
-	_, err = tfresource.WaitForWorkRequestWithErrorHandling(s.WorkRequestClient, workId, "instance", oci_work_requests.WorkRequestResourceActionTypeUpdated, s.D.Timeout(schema.TimeoutUpdate), s.DisableNotFoundRetries)
+	_, err = tfresource.WaitForWorkRequestWithErrorHandlingAndContext(ctx, s.WorkRequestClient, workId, "instance", oci_work_requests.WorkRequestResourceActionTypeUpdated, s.D.Timeout(schema.TimeoutUpdate), s.DisableNotFoundRetries)
 	if err != nil {
 		return err
 	}
