@@ -1203,6 +1203,7 @@ mysql
 * oci\_mysql\_mysql\_db\_system
 * oci\_mysql\_channel
 * oci\_mysql\_replica
+* oci\_mysql\_blue\_green\_deployment
 
 network_firewall
 

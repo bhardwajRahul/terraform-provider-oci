@@ -6,6 +6,8 @@ package mysql
 import "github.com/oracle/terraform-provider-oci/internal/tfresource"
 
 func RegisterDatasource() {
+	tfresource.RegisterDatasource("oci_mysql_blue_green_deployment", MysqlBlueGreenDeploymentDataSource())
+	tfresource.RegisterDatasource("oci_mysql_blue_green_deployments", MysqlBlueGreenDeploymentsDataSource())
 	tfresource.RegisterDatasource("oci_mysql_channel", MysqlChannelDataSource())
 	tfresource.RegisterDatasource("oci_mysql_channels", MysqlChannelsDataSource())
 	tfresource.RegisterDatasource("oci_mysql_db_system_maintenance_events", MysqlDbSystemMaintenanceEventsDataSource())
