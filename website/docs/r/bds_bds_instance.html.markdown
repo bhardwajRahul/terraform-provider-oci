@@ -21,6 +21,7 @@ Creates a new BDS instance.
 ```hcl
 resource "oci_bds_bds_instance" "test_bds_instance" {
 	#Required
+	cluster_admin_password = var.bds_instance_cluster_admin_password
 	cluster_public_key = var.bds_instance_cluster_public_key
 	cluster_version = var.bds_instance_cluster_version
 	compartment_id = var.compartment_id
@@ -72,6 +73,7 @@ resource "oci_bds_bds_instance" "test_bds_instance" {
 			ocpus = var.bds_instance_nodes_shape_config_ocpus
 		}
 	}
+
 	compute_only_worker_node {
 		#Required
 		shape = var.bds_instance_nodes_shape
@@ -119,15 +121,20 @@ resource "oci_bds_bds_instance" "test_bds_instance" {
 	}
 
 	#Optional
-	bds_cluster_version_summary {
+	bds_capacity_reservation_configurations {
 		#Required
-		bds_version = var.bds_instance_bds_cluster_version_summary_bds_version
+		bds_capacity_reservation_id = oci_bds_bds_capacity_reservation.test_bds_capacity_reservation.id
+		display_name = var.bds_instance_bds_capacity_reservation_configurations_display_name
+	}
 
+	bds_cluster_version_summary {
 		#Optional
+		bds_version = var.bds_instance_bds_cluster_version_summary_bds_version
 		odh_version = var.bds_instance_bds_cluster_version_summary_odh_version
 	}
+
+	#Optional
 	bootstrap_script_url = var.bds_instance_bootstrap_script_url
-	cluster_admin_password = var.bds_instance_cluster_admin_password
 	cluster_profile = var.bds_instance_cluster_profile
 	defined_tags = var.bds_instance_defined_tags
 	freeform_tags = var.bds_instance_freeform_tags
@@ -141,7 +148,8 @@ resource "oci_bds_bds_instance" "test_bds_instance" {
 		cidr_block = var.bds_instance_network_config_cidr_block
 		is_nat_gateway_required = var.bds_instance_network_config_is_nat_gateway_required
 	}
-	secret_id = oci_vault_secret.test_secret.id
+	# Use secret_id instead of cluster_admin_password when the admin password is stored in Vault.
+	# secret_id = oci_vault_secret.test_secret.id
 }
 ```
 
@@ -149,9 +157,12 @@ resource "oci_bds_bds_instance" "test_bds_instance" {
 
 The following arguments are supported:
 
-* `bds_cluster_version_summary` - (Optional) Cluster version details including bds and odh version information.
-	* `bds_version` - (Required) BDS version to be used for cluster creation
-	* `odh_version` - (Optional) ODH version to be used for cluster creation
+* `bds_capacity_reservation_configurations` - (Optional) Optional BDS capacity reservation configurations to associate with the cluster during creation.
+	* `bds_capacity_reservation_id` - (Required) The OCID of the BDS capacity reservation to associate with the BDS cluster.
+	* `display_name` - (Required) A user-friendly name for the BDS capacity reservation configuration.
+* `bds_cluster_version_summary` - (Optional) Cluster version details including BDS and ODH version information. When this block is specified, provide at least one of `bds_version` or `odh_version`; if both values are null, the service rejects the request.
+	* `bds_version` - (Optional) BDS version to be used for cluster creation.
+	* `odh_version` - (Optional) ODH version to be used for cluster creation.
 * `bootstrap_script_url` - (Optional) (Updatable) Pre-authenticated URL of the script in Object Store that is downloaded and executed.
 * `cluster_admin_password` - (Optional) (Updatable) Base-64 encoded password for the cluster (and Cloudera Manager) admin user. Not required if the secretId is specified.
 * `cluster_profile` - (Optional) Profile of the Big Data Service cluster.
@@ -169,9 +180,10 @@ The following arguments are supported:
 * `is_secure` - (Required) Boolean flag specifying whether or not the cluster should be setup as secure.
 * `kerberos_realm_name` - (Optional) The user-defined kerberos realm name.
 * `kms_key_id` - (Optional) (Updatable) The OCID of the Key Management master encryption key.
-* `network_config` - (Optional) (Updatable) Additional configuration of the user's network.
-	* `cidr_block` - (Optional) (Updatable) The CIDR IP address block of the VCN.
-	* `is_nat_gateway_required` - (Optional) (Updatable) A boolean flag whether to configure a NAT gateway.
+* `network_config` - (Optional) Additional configuration of the user's network.
+	* `cidr_block` - (Optional) The CIDR IP address block of the VCN.
+	* `is_nat_gateway_required` - (Optional) A boolean flag whether to configure a NAT gateway.
+* `state` - (Optional) (Updatable) The target state for the Bds Instance. Could be set to `ACTIVE` or `INACTIVE`. 
 * `nodes` - (Required) The list of nodes in the Big Data Service cluster.
 	* `block_volume_size_in_gbs` - (Required) The size of block volume in GB to be attached to a given node. All the details needed for attaching the block volume are managed by service itself. 
 	* `node_type` - (Required) The Big Data Service cluster node type.
@@ -181,18 +193,12 @@ The following arguments are supported:
 		* `nvmes` - (Optional) The number of NVMe drives to be used for storage. A single drive has 6.8 TB available.
 		* `ocpus` - (Optional) The total number of OCPUs available to the node.
 	* `subnet_id` - (Required) The OCID of the subnet in which the node will be created.
-	* `state` - (Optional) (Updatable) The target state for the Bds Instance. Could be set to `ACTIVE` or `INACTIVE`. 
-	* `execute_bootstrap_script_trigger` - (Optional) (Updatable) An optional property when incremented triggers Execute Bootstrap Script. Could be set to any integer value.
-	* `install_os_patch_trigger` - (Optional) (Updatable) An optional property when incremented triggers Install Os Patch. Could be set to any integer value.
-	* `remove_kafka_trigger` - (Optional) (Updatable) An optional property when incremented triggers Remove Kafka. Could be set to any integer value.
-	* `remove_node` - (Optional) (Updatable) An optional property when used triggers Remove Node. Takes the node ocid as input.
-	* `install_os_patch_trigger` - (Optional) (Updatable) An optional property when incremented triggers Install Os Patch. Could be set to any integer value.
-	* `secret_id` - (Optional) (Updatable) The secretId for the clusterAdminPassword.
+* `secret_id` - (Optional) (Updatable) The secretId for the clusterAdminPassword.
 * `state` - (Optional) (Updatable) The target state for the Bds Instance. Could be set to `ACTIVE` or `INACTIVE`.
 * `remove_node` - (Optional) (Updatable) An optional property when used triggers Remove Node from an Active Cluster. Takes the node ocid as input
 * `is_force_stop_jobs` - (Optional) (Updatable) When setting state as `INACTIVE` for stopping a cluster, setting this flag to true forcefully stops the bds instance.
 * `is_kafka_configured` - (Optional) Boolean flag specifying whether or not Kafka should be configured.
-* `os_patch_version`  - (Optional) (Updatable) The version of the patch to be upated.
+* `os_patch_version`  - (Optional) (Updatable) The version of the patch to be updated.
 * `state` - (Optional) (Updatable) The target state for the Bds Instance. Could be set to `ACTIVE` or `INACTIVE` to start/stop the bds instance.
 * `is_force_stop_jobs` - (Optional) (Updatable) When setting state as `INACTIVE` for stopping a cluster, setting this flag to true forcefully stops the bds instance.
 * `ignore_existing_nodes_shape` - Tag to ignore changing the shape of existing worker, master, utility, compute_only_worker, edge, kafka_broker nodes, in a list format, when new nodes are added with a different shape.
@@ -212,7 +218,7 @@ The following arguments are supported:
 	* `shape_config` - (Optional) The shape configuration requested for the node.
 		* `memory_in_gbs` - (Optional) The total amount of memory available to the node, in gigabytes
 		* `ocpus` - (Optional) The total number of OCPUs available to the node.
-* `woker_node` - (Required) The worker node in the BDS instance
+* `worker_node` - (Required) The worker node in the BDS instance
 	* `block_volume_size_in_gbs` - (Optional) The size of block volume in GB that needs to be attached to a given node. All the necessary details needed for attachment are managed by service itself.
 	* `number_of_nodes` - (Required) The amount of worker nodes should be created, at least be 3.
 	* `shape` - (Required) Shape of the node
@@ -220,7 +226,7 @@ The following arguments are supported:
 	* `shape_config` - (Optional) The shape configuration requested for the node.
 		* `memory_in_gbs` - (Optional) The total amount of memory available to the node, in gigabytes
 		* `ocpus` - (Optional) The total number of OCPUs available to the node.
-* `compute_only_woker_node` - (Optional) The worker node in the BDS instance
+* `compute_only_worker_node` - (Optional) The compute-only worker node in the BDS instance
 	* `block_volume_size_in_gbs` - (Optional) The size of block volume in GB that needs to be attached to a given node. All the necessary details needed for attachment are managed by service itself.
 	* `number_of_nodes` - (Required) The amount of worker nodes should be created
 	* `shape` - (Required) Shape of the node
@@ -236,13 +242,6 @@ The following arguments are supported:
 	* `shape_config` - (Optional) The shape configuration requested for the node.
 		* `memory_in_gbs` - (Optional) The total amount of memory available to the node, in gigabytes
 		* `ocpus` - (Optional) The total number of OCPUs available to the node.
-    * `block_volume_size_in_gbs` - (Optional) The size of block volume in GB that needs to be attached to a given node. All the necessary details needed for attachment are managed by service itself.
-    * `number_of_nodes` - (Required) The amount of worker nodes should be created
-    * `shape` - (Required) Shape of the node
-    * `subnet_id` - (Required) The OCID of the subnet in which the node should be created
-    * `shape_config` - (Optional) The shape configuration requested for the node.
-        * `memory_in_gbs` - (Optional) The total amount of memory available to the node, in gigabytes
-        * `ocpus` - (Optional) The total number of OCPUs available to the node.
 ** IMPORTANT **
 Any change to a property that does not support update will force the destruction and recreation of the resource with the new property values
 
@@ -250,9 +249,17 @@ Any change to a property that does not support update will force the destruction
 
 The following attributes are exported:
 
-* `bds_cluster_version_summary` - Cluster version details including bds and odh version information.
-	* `bds_version` - BDS version to be used for cluster creation
-	* `odh_version` - ODH version to be used for cluster creation
+* `bds_capacity_reservation_configurations` - The list of BDS capacity reservation configurations associated with the cluster.
+	* `bds_capacity_reservation_id` - The OCID of the BDS capacity reservation associated with the BDS cluster.
+	* `bds_instance_id` - The OCID of the BDS cluster associated with the BDS capacity reservation.
+	* `display_name` - The display name of the BDS capacity reservation configuration.
+	* `id` - The OCID of the BDS capacity reservation configuration.
+	* `state` - The lifecycle state of the BDS capacity reservation configuration.
+	* `time_created` - The time the BDS capacity reservation configuration was created, shown as an RFC 3339 formatted datetime string.
+	* `time_updated` - The time the BDS capacity reservation configuration was updated, shown as an RFC 3339 formatted datetime string.
+* `bds_cluster_version_summary` - Cluster version details including BDS and ODH version information.
+	* `bds_version` - BDS version to be used for cluster creation.
+	* `odh_version` - ODH version to be used for cluster creation.
 * `bootstrap_script_url` - pre-authenticated URL of the bootstrap script in Object Store that can be downloaded and executed.
 * `cloud_sql_details` - The information about added Cloud SQL capability
 	* `block_volume_size_in_gbs` - The size of block volume in GB that needs to be attached to a given node. All the necessary details needed for attachment are managed by service itself. 
@@ -302,6 +309,7 @@ The following attributes are exported:
 		* `volume_size_in_gbs` - The size of the volume in GBs.
 	* `availability_domain` - The name of the availability domain in which the node is running.
 	* `certificate_configuration_id` - ID of the certificate configuration which is used to generate the certificate for the node.
+	* `compute_capacity_reservation_id` - The OCID of the Compute capacity reservation used by this node.
 	* `display_name` - The name of the node.
 	* `fault_domain` - The name of the fault domain in which the node is running.
 	* `hostname` - The fully-qualified hostname (FQDN) of the node.
@@ -330,37 +338,13 @@ The following attributes are exported:
 * `time_created` - The time the cluster was created, shown as an RFC 3339 formatted datetime string.
 * `time_earliest_certificate_expiration` - The earliest time of certificate expiration date across the certificates of all current nodes under this cluster.
 * `time_updated` - The time the cluster was updated, shown as an RFC 3339 formatted datetime string.
-* `nodes` - The list of nodes in the BDS instance
-    * `attached_block_volumes` - The list of block volumes attached to a given node.
-        * `volume_attachment_id` - The OCID of the volume attachment.
-        * `volume_size_in_gbs` - The size of the volume in GBs.
-    * `availability_domain` - The name of the availability domain the node is running in
-    * `display_name` - The name of the node
-    * `fault_domain` - The name of the fault domain the node is running in
-    * `hostname` - The fully-qualified hostname (FQDN) of the node
-    * `image_id` - The OCID of the image from which the node was created
-    * `instance_id` - The OCID of the underlying compute instance
-    * `ip_address` - IP address of the node
-    * `memory_in_gbs` - The total amount of memory available to the node, in gigabytes.
-    * `node_type` - BDS instance node type
-    * `ocpus` - The total number of OCPUs available to the node.
-    * `shape` - Shape of the node
-    * `ssh_fingerprint` - The fingerprint of the SSH key used for node access
-    * `state` - The state of the node
-    * `subnet_id` - The OCID of the subnet in which the node should be created
-    * `time_created` - The time the node was created. An RFC3339 formatted datetime string
-    * `time_updated` - The time the BDS instance was updated. An RFC3339 formatted datetime string
-* `number_of_nodes` - Number of nodes that forming the cluster
-* `state` - The state of the BDS instance
-* `time_created` - The time the BDS instance was created. An RFC3339 formatted datetime string
-* `time_updated` - The time the BDS instance was updated. An RFC3339 formatted datetime string
 
 ## Timeouts
 
 The `timeouts` block allows you to specify [timeouts](https://registry.terraform.io/providers/oracle/oci/latest/docs/guides/changing_timeouts) for certain operations:
-	* `create` - (Defaults to 20 minutes), when creating the Bds Instance
-	* `update` - (Defaults to 20 minutes), when updating the Bds Instance
-	* `delete` - (Defaults to 20 minutes), when destroying the Bds Instance
+	* `create` - (Defaults to 12 hours), when creating the Bds Instance
+	* `update` - (Defaults to 12 hours), when updating the Bds Instance
+	* `delete` - (Defaults to 12 hours), when destroying the Bds Instance
 
 
 ## Import
@@ -370,4 +354,3 @@ BdsInstances can be imported using the `id`, e.g.
 ```
 $ terraform import oci_bds_bds_instance.test_bds_instance "id"
 ```
-

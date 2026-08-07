@@ -7,11 +7,16 @@ import "github.com/oracle/terraform-provider-oci/internal/tfresource"
 
 func RegisterDatasource() {
 	tfresource.RegisterDatasource("oci_bds_auto_scaling_configuration", BdsAutoScalingConfigurationDataSource())
+	tfresource.RegisterDatasource("oci_bds_bds_capacity_reservation", BdsBdsCapacityReservationDataSource())
+	tfresource.RegisterDatasource("oci_bds_bds_capacity_reservation_associated_configurations", BdsBdsCapacityReservationAssociatedConfigurationsDataSource())
+	tfresource.RegisterDatasource("oci_bds_bds_capacity_reservations", BdsBdsCapacityReservationsDataSource())
 	tfresource.RegisterDatasource("oci_bds_bds_cluster_versions", BdsBdsClusterVersionsDataSource())
 	tfresource.RegisterDatasource("oci_bds_auto_scaling_configurations", BdsAutoScalingConfigurationsDataSource())
 	tfresource.RegisterDatasource("oci_bds_bds_instance", BdsBdsInstanceDataSource())
 	tfresource.RegisterDatasource("oci_bds_bds_instance_api_key", BdsBdsInstanceApiKeyDataSource())
 	tfresource.RegisterDatasource("oci_bds_bds_instance_api_keys", BdsBdsInstanceApiKeysDataSource())
+	tfresource.RegisterDatasource("oci_bds_bds_instance_bds_capacity_reservation_configuration", BdsBdsInstanceBdsCapacityReservationConfigurationDataSource())
+	tfresource.RegisterDatasource("oci_bds_bds_instance_bds_capacity_reservation_configurations", BdsBdsInstanceBdsCapacityReservationConfigurationsDataSource())
 	tfresource.RegisterDatasource("oci_bds_bds_instance_bds_certificate_configuration", BdsBdsInstanceBdsCertificateConfigurationDataSource())
 	tfresource.RegisterDatasource("oci_bds_bds_instance_bds_certificate_configurations", BdsBdsInstanceBdsCertificateConfigurationsDataSource())
 	tfresource.RegisterDatasource("oci_bds_bds_instance_get_os_patch", BdsBdsInstanceGetOsPatchDataSource())

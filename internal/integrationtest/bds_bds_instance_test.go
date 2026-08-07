@@ -67,6 +67,8 @@ var (
 		"network_config": acctest.RepresentationGroup{RepType: acctest.Optional, Group: BdsbdsInstanceNetworkConfigRepresentation},
 	}
 
+	BdsBdsInstanceRepresentation = BdsbdsInstanceRepresentation
+
 	BdsbdsInstanceNodesCloudSqlRepresentation = map[string]interface{}{
 		"shape":                    acctest.Representation{RepType: acctest.Required, Create: `VM.Standard2.4`, Update: `VM.Standard2.8`},
 		"block_volume_size_in_gbs": acctest.Representation{RepType: acctest.Required, Create: `1000`},
@@ -78,6 +80,7 @@ var (
 		"block_volume_size_in_gbs": acctest.Representation{RepType: acctest.Required, Create: `150`},
 		"number_of_nodes":          acctest.Representation{RepType: acctest.Required, Create: `1`},
 	}
+
 	BdsbdsInstanceNodesUtilRepresentation = map[string]interface{}{
 		"shape":                    acctest.Representation{RepType: acctest.Required, Create: `VM.Standard2.4`, Update: `VM.Standard2.8`},
 		"subnet_id":                acctest.Representation{RepType: acctest.Required, Create: `${oci_core_subnet.test_subnet.id}`},
@@ -318,7 +321,6 @@ func TestBdsBdsInstanceResource_basic(t *testing.T) {
 				compartmentIdVariableStr + BdsBdsInstanceResourceConfig,
 			Check: acctest.ComposeAggregateTestCheckFuncWrapper(
 				resource.TestCheckResourceAttrSet(singularDatasourceName, "bds_instance_id"),
-
 				resource.TestCheckResourceAttr(singularDatasourceName, "cloud_sql_details.#", "0"),
 				resource.TestCheckResourceAttr(singularDatasourceName, "cluster_details.#", "1"),
 				resource.TestCheckResourceAttr(singularDatasourceName, "cluster_version", "ODH2_0"),
