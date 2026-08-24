@@ -39,7 +39,7 @@ The following arguments are supported:
 * `digital_twin_model_spec_uri` - (Optional) Filter resources that match the specified URI (DTMI) of the digital twin model. 
 * `display_name` - (Optional) Filter resources whose display name matches the specified value. 
 * `id` - (Optional) Filter resources by [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm). Must be a valid OCID of the resource type. 
-* `iot_domain_id` - (Required) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the IoT domain in which to list digital twin resources. 
+* `iot_domain_id` - (Required) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the IoT domain in which to list IoT resources. 
 * `state` - (Optional) Filter resources whose lifecycleState matches the specified value. 
 
 
@@ -54,7 +54,7 @@ The following attributes are exported:
 The following attributes are exported:
 
 * `auth_id` - The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the resource (like VaultSecret, ClientCertificate etc.,) used to authenticate the digital twin instance.
-* `connectivity_type` - Connectivity type of the digital twin instance
+* `connectivity_type` - 
 * `defined_tags` - Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/resourcetags.htm).  Example: `{"Operations.CostCenter": "42"}` 
 * `description` - A short description of the resource. 
 * `digital_twin_adapter_id` - The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the digital twin adapter.

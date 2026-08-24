@@ -20,4 +20,7 @@ func RegisterDatasource() {
 	tfresource.RegisterDatasource("oci_iot_iot_domain_group", IotIotDomainGroupDataSource())
 	tfresource.RegisterDatasource("oci_iot_iot_domain_groups", IotIotDomainGroupsDataSource())
 	tfresource.RegisterDatasource("oci_iot_iot_domains", IotIotDomainsDataSource())
+	tfresource.RegisterDatasource("oci_iot_iot_flow_runtime", IotIotFlowRuntimeDataSource())
+	tfresource.RegisterDatasource("oci_iot_iot_flow_runtime_flow", IotIotFlowRuntimeFlowDataSource())
+	tfresource.RegisterDatasource("oci_iot_iot_flow_runtimes", IotIotFlowRuntimesDataSource())
 }

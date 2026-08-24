@@ -36,7 +36,7 @@ The following arguments are supported:
 * `display_name` - (Optional) Filter resources whose display name matches the specified value. 
 * `id` - (Optional) Filter resources by [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm). Must be a valid OCID of the resource type. 
 * `state` - (Optional) Filter resources whose lifecycleState matches the specified value.
-* `type` - (Optional) Filter resources by type. Valid values are LIGHTWEIGHT or STANDARD.
+* `type` - (Optional) Filter resources by type. Valid values are DEVELOPMENT or PRODUCTION. LIGHTWEIGHT and STANDARD are deprecated aliases for DEVELOPMENT and PRODUCTION, respectively.
 
 
 ## Attributes Reference

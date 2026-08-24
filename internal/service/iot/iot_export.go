@@ -7,10 +7,17 @@ import (
 )
 
 func init() {
+	exportIotIotFlowRuntimeFlowHints.GetIdFn = getIotIotFlowRuntimeFlowId
 	tf_export.RegisterCompartmentGraphs("iot", iotResourceGraph)
 }
 
 // Custom overrides for generating composite IDs within the resource discovery framework
+
+func getIotIotFlowRuntimeFlowId(resource *tf_export.OCIResource) (string, error) {
+
+	iotFlowRuntimeId := resource.Parent.Id
+	return GetIotFlowRuntimeFlowCompositeId(iotFlowRuntimeId), nil
+}
 
 // Hints for discovering and exporting this resource to configuration and state files
 var exportIotDigitalTwinModelHints = &tf_export.TerraformResourceHints{
@@ -88,10 +95,32 @@ var exportIotDigitalTwinAdapterHints = &tf_export.TerraformResourceHints{
 	},
 }
 
+var exportIotIotFlowRuntimeFlowHints = &tf_export.TerraformResourceHints{
+	ResourceClass:        "oci_iot_iot_flow_runtime_flow",
+	DatasourceClass:      "oci_iot_iot_flow_runtime_flow",
+	ResourceAbbreviation: "iot_flow_runtime_flow",
+	DefaultValuesForMissingAttributes: map[string]interface{}{
+		"flows_document": "{}",
+	},
+}
+
+var exportIotIotFlowRuntimeHints = &tf_export.TerraformResourceHints{
+	ResourceClass:          "oci_iot_iot_flow_runtime",
+	DatasourceClass:        "oci_iot_iot_flow_runtimes",
+	DatasourceItemsAttr:    "iot_flow_runtime_collection",
+	IsDatasourceCollection: true,
+	ResourceAbbreviation:   "iot_flow_runtime",
+	RequireResourceRefresh: true,
+	DiscoverableLifecycleStates: []string{
+		string(oci_iot.IotFlowRuntimeLifecycleStateActive),
+	},
+}
+
 var iotResourceGraph = tf_export.TerraformResourceGraph{
 	"oci_identity_compartment": {
 		{TerraformResourceHints: exportIotIotDomainGroupHints},
 		{TerraformResourceHints: exportIotIotDomainHints},
+		{TerraformResourceHints: exportIotIotFlowRuntimeHints},
 	},
 	"oci_iot_iot_domain": {
 		{
@@ -116,6 +145,14 @@ var iotResourceGraph = tf_export.TerraformResourceGraph{
 			TerraformResourceHints: exportIotDigitalTwinRelationshipHints,
 			DatasourceQueryParams: map[string]string{
 				"iot_domain_id": "id",
+			},
+		},
+	},
+	"oci_iot_iot_flow_runtime": {
+		{
+			TerraformResourceHints: exportIotIotFlowRuntimeFlowHints,
+			DatasourceQueryParams: map[string]string{
+				"iot_flow_runtime_id": "id",
 			},
 		},
 	},

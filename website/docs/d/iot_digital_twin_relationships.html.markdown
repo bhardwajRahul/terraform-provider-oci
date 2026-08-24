@@ -37,7 +37,7 @@ The following arguments are supported:
 * `content_path` - (Optional) Filters resources that match the content path of the digital twin relationship. 
 * `display_name` - (Optional) Filter resources whose display name matches the specified value. 
 * `id` - (Optional) Filter resources by [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm). Must be a valid OCID of the resource type. 
-* `iot_domain_id` - (Required) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the IoT domain in which to list digital twin resources. 
+* `iot_domain_id` - (Required) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the IoT domain in which to list IoT resources. 
 * `source_digital_twin_instance_id` - (Optional) Filter resources that match the specified [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of source digital twin instance. 
 * `state` - (Optional) Filter resources whose lifecycleState matches the specified value. 
 * `target_digital_twin_instance_id` - (Optional) Filter resources that match the specified [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of target digital twin instance. 

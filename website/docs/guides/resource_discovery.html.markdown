@@ -1079,6 +1079,8 @@ iot
 * oci\_iot\_digital\_twin\_relationship
 * oci\_iot\_digital\_twin\_instance
 * oci\_iot\_digital\_twin\_adapter
+* oci\_iot\_iot\_flow\_runtime\_flow
+* oci\_iot\_iot\_flow\_runtime
 
 jms
 

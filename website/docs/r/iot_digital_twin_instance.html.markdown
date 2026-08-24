@@ -43,7 +43,7 @@ resource "oci_iot_digital_twin_instance" "test_digital_twin_instance" {
 The following arguments are supported:
 
 * `auth_id` - (Optional) (Updatable) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the resource (like VaultSecret, ClientCertificate etc.,) used to authenticate the digital twin instance.
-* `connectivity_type` - (Optional) Connectivity type of the digital twin instance
+* `connectivity_type` - (Optional) (Updatable) 
 * `defined_tags` - (Optional) (Updatable) Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/resourcetags.htm).  Example: `{"Operations.CostCenter": "42"}` 
 * `description` - (Optional) (Updatable) A short description of the resource. 
 * `digital_twin_adapter_id` - (Optional) (Updatable) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the digital twin adapter.
@@ -64,7 +64,7 @@ Any change to a property that does not support update will force the destruction
 The following attributes are exported:
 
 * `auth_id` - The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the resource (like VaultSecret, ClientCertificate etc.,) used to authenticate the digital twin instance.
-* `connectivity_type` - Connectivity type of the digital twin instance
+* `connectivity_type` - 
 * `defined_tags` - Defined tags for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/resourcetags.htm).  Example: `{"Operations.CostCenter": "42"}` 
 * `description` - A short description of the resource. 
 * `digital_twin_adapter_id` - The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the digital twin adapter.

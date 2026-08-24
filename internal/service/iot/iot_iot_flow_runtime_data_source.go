@@ -14,44 +14,44 @@ import (
 	"github.com/oracle/terraform-provider-oci/internal/tfresource"
 )
 
-func IotDigitalTwinInstanceDataSource() *schema.Resource {
+func IotIotFlowRuntimeDataSource() *schema.Resource {
 	fieldMap := make(map[string]*schema.Schema)
-	fieldMap["digital_twin_instance_id"] = &schema.Schema{
+	fieldMap["iot_flow_runtime_id"] = &schema.Schema{
 		Type:     schema.TypeString,
 		Required: true,
 	}
-	return tfresource.GetSingularDataSourceItemSchemaWithContext(IotDigitalTwinInstanceResource(), fieldMap, readSingularIotDigitalTwinInstanceWithContext)
+	return tfresource.GetSingularDataSourceItemSchemaWithContext(IotIotFlowRuntimeResource(), fieldMap, readSingularIotIotFlowRuntimeWithContext)
 }
 
-func readSingularIotDigitalTwinInstanceWithContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
-	sync := &IotDigitalTwinInstanceDataSourceCrud{}
+func readSingularIotIotFlowRuntimeWithContext(ctx context.Context, d *schema.ResourceData, m interface{}) diag.Diagnostics {
+	sync := &IotIotFlowRuntimeDataSourceCrud{}
 	sync.D = d
 	sync.Client = m.(*client.OracleClients).IotClient()
 
 	return tfresource.HandleDiagError(m, tfresource.ReadResourceWithContext(ctx, sync))
 }
 
-type IotDigitalTwinInstanceDataSourceCrud struct {
+type IotIotFlowRuntimeDataSourceCrud struct {
 	D      *schema.ResourceData
 	Client *oci_iot.IotClient
-	Res    *oci_iot.GetDigitalTwinInstanceResponse
+	Res    *oci_iot.GetIotFlowRuntimeResponse
 }
 
-func (s *IotDigitalTwinInstanceDataSourceCrud) VoidState() {
+func (s *IotIotFlowRuntimeDataSourceCrud) VoidState() {
 	s.D.SetId("")
 }
 
-func (s *IotDigitalTwinInstanceDataSourceCrud) GetWithContext(ctx context.Context) error {
-	request := oci_iot.GetDigitalTwinInstanceRequest{}
+func (s *IotIotFlowRuntimeDataSourceCrud) GetWithContext(ctx context.Context) error {
+	request := oci_iot.GetIotFlowRuntimeRequest{}
 
-	if digitalTwinInstanceId, ok := s.D.GetOkExists("digital_twin_instance_id"); ok {
-		tmp := digitalTwinInstanceId.(string)
-		request.DigitalTwinInstanceId = &tmp
+	if iotFlowRuntimeId, ok := s.D.GetOkExists("iot_flow_runtime_id"); ok {
+		tmp := iotFlowRuntimeId.(string)
+		request.IotFlowRuntimeId = &tmp
 	}
 
 	request.RequestMetadata.RetryPolicy = tfresource.GetRetryPolicy(false, "iot")
 
-	response, err := s.Client.GetDigitalTwinInstance(ctx, request)
+	response, err := s.Client.GetIotFlowRuntime(ctx, request)
 	if err != nil {
 		return err
 	}
@@ -60,18 +60,16 @@ func (s *IotDigitalTwinInstanceDataSourceCrud) GetWithContext(ctx context.Contex
 	return nil
 }
 
-func (s *IotDigitalTwinInstanceDataSourceCrud) SetData() error {
+func (s *IotIotFlowRuntimeDataSourceCrud) SetData() error {
 	if s.Res == nil {
 		return nil
 	}
 
 	s.D.SetId(*s.Res.Id)
 
-	if s.Res.AuthId != nil {
-		s.D.Set("auth_id", *s.Res.AuthId)
+	if s.Res.CompartmentId != nil {
+		s.D.Set("compartment_id", *s.Res.CompartmentId)
 	}
-
-	s.D.Set("connectivity_type", string(s.Res.ConnectivityType))
 
 	if s.Res.DefinedTags != nil {
 		s.D.Set("defined_tags", tfresource.DefinedTagsToMap(s.Res.DefinedTags))
@@ -81,33 +79,33 @@ func (s *IotDigitalTwinInstanceDataSourceCrud) SetData() error {
 		s.D.Set("description", *s.Res.Description)
 	}
 
-	if s.Res.DigitalTwinAdapterId != nil {
-		s.D.Set("digital_twin_adapter_id", *s.Res.DigitalTwinAdapterId)
-	}
-
-	if s.Res.DigitalTwinModelId != nil {
-		s.D.Set("digital_twin_model_id", *s.Res.DigitalTwinModelId)
-	}
-
-	if s.Res.DigitalTwinModelSpecUri != nil {
-		s.D.Set("digital_twin_model_spec_uri", *s.Res.DigitalTwinModelSpecUri)
-	}
-
 	if s.Res.DisplayName != nil {
 		s.D.Set("display_name", *s.Res.DisplayName)
 	}
 
-	if s.Res.ExternalKey != nil {
-		s.D.Set("external_key", *s.Res.ExternalKey)
+	if s.Res.FlowRuntimeHost != nil {
+		s.D.Set("flow_runtime_host", *s.Res.FlowRuntimeHost)
 	}
 
 	s.D.Set("freeform_tags", s.Res.FreeformTags)
 
-	s.D.Set("gateways", s.Res.Gateways)
-
 	if s.Res.IotDomainId != nil {
 		s.D.Set("iot_domain_id", *s.Res.IotDomainId)
 	}
+
+	if s.Res.LogConfig != nil {
+		s.D.Set("log_config", []interface{}{LogConfigDetailsToMap(s.Res.LogConfig)})
+	} else {
+		s.D.Set("log_config", nil)
+	}
+
+	if s.Res.NetworkConfig != nil {
+		s.D.Set("network_config", []interface{}{NetworkConfigDetailsToMap(s.Res.NetworkConfig, true)})
+	} else {
+		s.D.Set("network_config", nil)
+	}
+
+	s.D.Set("scale", s.Res.Scale)
 
 	s.D.Set("state", s.Res.LifecycleState)
 
