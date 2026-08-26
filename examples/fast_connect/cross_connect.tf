@@ -12,7 +12,7 @@ variable "cross_connect_secret_version_ckn" {
 resource "oci_core_cross_connect" "cross_connect_on_device" {
   #Required
   compartment_id        = var.compartment_ocid
-  location_name         = data.oci_core_cross_connect_locations.cross_connect_locations.cross_connect_locations[1].name
+  location_name         = data.oci_core_cross_connect_locations.cross_connect_locations.cross_connect_locations[0].name
   port_speed_shape_name = data.oci_core_cross_connect_port_speed_shapes.cross_connect_port_speed_shapes.cross_connect_port_speed_shapes[1].name
 
   #Optional

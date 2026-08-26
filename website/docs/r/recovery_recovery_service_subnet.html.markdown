@@ -29,6 +29,7 @@ resource "oci_recovery_recovery_service_subnet" "test_recovery_service_subnet" {
 	defined_tags = {"foo-namespace.bar-key"= "value"}
 	freeform_tags = {"bar-key"= "value"}
 	nsg_ids = var.recovery_service_subnet_nsg_ids
+	security_attributes = var.recovery_service_subnet_security_attributes
 	subnet_id = oci_core_subnet.test_subnet.id
 	subnets = var.recovery_service_subnet_subnets
 }
@@ -43,6 +44,7 @@ The following arguments are supported:
 * `display_name` - (Required) (Updatable) A user-provided name for the recovery service subnet. The 'displayName' does not have to be unique, and it can be modified. Avoid entering confidential information.
 * `freeform_tags` - (Optional) (Updatable) Simple key-value pair that is applied without any predefined name, type or scope. Exists for cross-compatibility only. Example: `{"bar-key": "value"}` 
 * `nsg_ids` - (Optional) (Updatable) A list of network security group (NSG) OCIDs that are associated with the Recovery Service subnet. You can specify a maximum of 5 unique OCIDs, which implies that you can associate a maximum of 5 NSGs to each Recovery Service subnet. Specify an empty array if you want to remove all the associated NSGs from a Recovery Service subnet. See [Network Security Groups](https://docs.cloud.oracle.com/iaas/api/#/en/iaas/latest/NetworkSecurityGroup/) for more information. 
+* `security_attributes` - (Optional) (Updatable) Security attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/resourcetags.htm).  Example: `{"Oracle-ZPR": {"MaxEgressCount": {"value": "42", "mode": "enforce"}}}` 
 * `subnet_id` - (Optional) Deprecated. One of the subnets associated with the Recovery Service subnet. 
 * `subnets` - (Optional) (Updatable) A list of OCIDs of the subnets associated with the Recovery Service subnet.
 * `vcn_id` - (Required) The OCID of the virtual cloud network (VCN) that contains the recovery service subnet. You can create a single recovery service subnet per VCN.
@@ -62,6 +64,7 @@ The following attributes are exported:
 * `id` - The recovery service subnet OCID.
 * `lifecycle_details` - Detailed description about the current lifecycle state of the recovery service subnet. For example, it can be used to provide actionable information for a resource in a Failed state
 * `nsg_ids` - A list of network security group (NSG) OCIDs that are associated with the Recovery Service subnet. You can specify a maximum of 5 unique OCIDs, which implies that you can associate a maximum of 5 NSGs to each Recovery Service subnet. Specify an empty array if you want to remove all the associated NSGs from a Recovery Service subnet. See [Network Security Groups](https://docs.cloud.oracle.com/iaas/api/#/en/iaas/latest/NetworkSecurityGroup/) for more information. 
+* `security_attributes` - Security attributes for this resource. Each key is predefined and scoped to a namespace. For more information, see [Resource Tags](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/resourcetags.htm).  Example: `{"Oracle-ZPR": {"MaxEgressCount": {"value": "42", "mode": "enforce"}}}` 
 * `state` - The current state of the recovery service subnet. 
 * `subnet_id` - Deprecated. One of the subnets associated with the Recovery Service subnet. 
 * `subnets` - A list of OCIDs of all the subnets associated with the Recovery Service subnet.

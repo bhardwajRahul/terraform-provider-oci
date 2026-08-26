@@ -36,7 +36,10 @@ var (
 	BdsBdsInstanceNodeBackupDataSourceRepresentation = map[string]interface{}{
 		"bds_instance_id": acctest.Representation{RepType: acctest.Required, Create: `${oci_bds_bds_instance.test_bds_instance.id}`},
 	}
-	BdsBdsInstanceNodeBackupResourceDependencies = acctest.GenerateResourceFromRepresentationMap("oci_bds_bds_instance", "test_bds_instance", acctest.Optional, acctest.Create, bdsInstanceOdhRepresentation) +
+
+	BdsBdsInstanceNodeBackupBdsInstanceRepresentation = acctest.RepresentationCopyWithRemovedProperties(bdsInstanceOdhRepresentation, []string{"bootstrap_script_url", "kms_key_id"})
+
+	BdsBdsInstanceNodeBackupResourceDependencies = acctest.GenerateResourceFromRepresentationMap("oci_bds_bds_instance", "test_bds_instance", acctest.Optional, acctest.Create, BdsBdsInstanceNodeBackupBdsInstanceRepresentation) +
 		acctest.GenerateResourceFromRepresentationMap("oci_core_subnet", "test_subnet", acctest.Required, acctest.Create, CoreSubnetRepresentation) +
 		acctest.GenerateResourceFromRepresentationMap("oci_core_vcn", "test_vcn", acctest.Required, acctest.Create, CoreVcnRepresentation)
 

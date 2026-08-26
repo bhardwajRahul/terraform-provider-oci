@@ -10,17 +10,18 @@ import (
 
 func init() {
 	exportBdsBdsInstanceApiKeyHints.GetIdFn = getBdsBdsInstanceApiKeyId
-	exportBdsBdsInstanceApiKeyHints.ProcessDiscoveredResourcesFn = processBdsInstanceApiKeys
 	exportBdsBdsInstanceMetastoreConfigHints.GetIdFn = getBdsBdsInstanceMetastoreConfigId
+	exportBdsBdsInstanceApiKeyHints.ProcessDiscoveredResourcesFn = processBdsInstanceApiKeys
 	exportBdsBdsInstanceMetastoreConfigHints.ProcessDiscoveredResourcesFn = processBdsInstanceMetastoreConfigs
-	exportBdsBdsInstanceIdentityConfigurationHints.GetIdFn = getBdsBdsInstanceIdentityConfigurationId
 	exportBdsBdsInstanceIdentityConfigurationHints.ProcessDiscoveredResourcesFn = processBdsInstanceIdentityConfigurations
 	exportBdsBdsInstanceResourcePrincipalConfigurationHints.GetIdFn = getBdsBdsInstanceResourcePrincipalConfigurationId
 	exportBdsBdsInstanceNodeReplaceConfigurationHints.GetIdFn = getBdsBdsInstanceNodeReplaceConfigurationId
-	exportBdsBdsInstanceNodeReplaceConfigurationHints.ProcessDiscoveredResourcesFn = processBdsInstanceNodeReplaceConfigurations
 	exportBdsBdsInstanceNodeBackupConfigurationHints.GetIdFn = getBdsBdsInstanceNodeBackupConfigurationId
-	exportBdsBdsInstanceNodeBackupConfigurationHints.ProcessDiscoveredResourcesFn = processBdsInstanceNodeBackupConfigurations
+	exportBdsBdsInstanceIdentityConfigurationHints.GetIdFn = getBdsBdsInstanceIdentityConfigurationId
 	exportBdsBdsInstanceBdsCertificateConfigurationHints.GetIdFn = getBdsBdsInstanceBdsCertificateConfigurationId
+	exportBdsBdsInstanceBdsCapacityReservationConfigurationHints.GetIdFn = getBdsBdsInstanceBdsCapacityReservationConfigurationId
+	exportBdsBdsInstanceNodeBackupConfigurationHints.ProcessDiscoveredResourcesFn = processBdsInstanceNodeBackupConfigurations
+	exportBdsBdsInstanceNodeReplaceConfigurationHints.ProcessDiscoveredResourcesFn = processBdsInstanceNodeReplaceConfigurations
 	tf_export.RegisterCompartmentGraphs("bds", bdsResourceGraph)
 }
 
@@ -150,6 +151,16 @@ func getBdsBdsInstanceBdsCertificateConfigurationId(resource *tf_export.OCIResou
 	return GetBdsInstanceBdsCertificateConfigurationCompositeId(bdsCertificateConfigurationId, bdsInstanceId), nil
 }
 
+func getBdsBdsInstanceBdsCapacityReservationConfigurationId(resource *tf_export.OCIResource) (string, error) {
+
+	bdsCapacityReservationConfigurationId, ok := resource.SourceAttributes["bds_capacity_reservation_configuration_id"].(string)
+	if !ok {
+		return "", fmt.Errorf("[ERROR] unable to find bdsCapacityReservationConfigurationId for Bds BdsInstanceBdsCapacityReservationConfiguration")
+	}
+	bdsInstanceId := resource.Parent.Id
+	return GetBdsInstanceBdsCapacityReservationConfigurationCompositeId(bdsCapacityReservationConfigurationId, bdsInstanceId), nil
+}
+
 // Hints for discovering and exporting this resource to configuration and state files
 var exportBdsBdsInstanceHints = &tf_export.TerraformResourceHints{
 	ResourceClass:          "oci_bds_bds_instance",
@@ -240,13 +251,44 @@ var exportBdsBdsInstanceBdsCertificateConfigurationHints = &tf_export.TerraformR
 	},
 }
 
+var exportBdsBdsInstanceBdsCapacityReservationConfigurationHints = &tf_export.TerraformResourceHints{
+	ResourceClass:          "oci_bds_bds_instance_bds_capacity_reservation_configuration",
+	DatasourceClass:        "oci_bds_bds_instance_bds_capacity_reservation_configurations",
+	DatasourceItemsAttr:    "bds_capacity_reservation_configuration_collection",
+	IsDatasourceCollection: true,
+	ResourceAbbreviation:   "bds_instance_bds_capacity_reservation_configuration",
+	RequireResourceRefresh: true,
+	DiscoverableLifecycleStates: []string{
+		string(oci_bds.BdsCapacityReservationConfigurationLifecycleStateActive),
+	},
+}
+
+var exportBdsBdsCapacityReservationHints = &tf_export.TerraformResourceHints{
+	ResourceClass:          "oci_bds_bds_capacity_reservation",
+	DatasourceClass:        "oci_bds_bds_capacity_reservations",
+	DatasourceItemsAttr:    "bds_capacity_reservation_collection",
+	IsDatasourceCollection: true,
+	ResourceAbbreviation:   "bds_capacity_reservation",
+	RequireResourceRefresh: true,
+	DiscoverableLifecycleStates: []string{
+		string(oci_bds.BdsCapacityReservationLifecycleStateActive),
+	},
+}
+
 var bdsResourceGraph = tf_export.TerraformResourceGraph{
 	"oci_identity_compartment": {
 		{TerraformResourceHints: exportBdsBdsInstanceHints},
+		{TerraformResourceHints: exportBdsBdsCapacityReservationHints},
 	},
 	"oci_bds_bds_instance": {
 		{
 			TerraformResourceHints: exportBdsBdsInstanceApiKeyHints,
+			DatasourceQueryParams: map[string]string{
+				"bds_instance_id": "id",
+			},
+		},
+		{
+			TerraformResourceHints: exportBdsBdsInstanceBdsCapacityReservationConfigurationHints,
 			DatasourceQueryParams: map[string]string{
 				"bds_instance_id": "id",
 			},

@@ -12,6 +12,7 @@ func init() {
 	exportMysqlMysqlBackupHints.RequireResourceRefresh = true
 	exportMysqlMysqlBackupHints.ProcessDiscoveredResourcesFn = filterMysqlBackups
 	exportMysqlMysqlDbSystemHints.ProcessDiscoveredResourcesFn = processMysqlDbSystem
+	exportMysqlBlueGreenDeploymentHints.ProcessDiscoveredResourcesFn = processMysqlBlueGreenDeployments
 	tf_export.RegisterCompartmentGraphs("mysql", mysqlResourceGraph)
 }
 
@@ -46,6 +47,21 @@ func processMysqlDbSystem(ctx *tf_export.ResourceDiscoveryContext, resources []*
 				}
 			}
 		}
+	}
+
+	return resources, nil
+}
+
+// The service does not return the create-time channel credentials. Preserve
+// the block shape so resource discovery can generate standard placeholders and
+// ignore_changes entries for the missing required fields.
+func processMysqlBlueGreenDeployments(ctx *tf_export.ResourceDiscoveryContext, resources []*tf_export.OCIResource) ([]*tf_export.OCIResource, error) {
+	for _, deployment := range resources {
+		channelDetails := map[string]interface{}{}
+		if sslMode, exists := deployment.SourceAttributes["ssl_mode"]; exists {
+			channelDetails["ssl_mode"] = sslMode
+		}
+		deployment.SourceAttributes["channel_details"] = []interface{}{channelDetails}
 	}
 
 	return resources, nil
@@ -135,6 +151,18 @@ var exportMysqlReplicaHints = &tf_export.TerraformResourceHints{
 	},
 }
 
+var exportMysqlBlueGreenDeploymentHints = &tf_export.TerraformResourceHints{
+	ResourceClass:          "oci_mysql_blue_green_deployment",
+	DatasourceClass:        "oci_mysql_blue_green_deployments",
+	DatasourceItemsAttr:    "blue_green_deployment_collection",
+	IsDatasourceCollection: true,
+	ResourceAbbreviation:   "blue_green_deployment",
+	RequireResourceRefresh: true,
+	DiscoverableLifecycleStates: []string{
+		string(oci_mysql.BlueGreenDeploymentLifecycleStateActive),
+	},
+}
+
 var mysqlResourceGraph = tf_export.TerraformResourceGraph{
 	"oci_identity_compartment": {
 		{TerraformResourceHints: exportMysqlMysqlConfigurationHints},
@@ -142,5 +170,6 @@ var mysqlResourceGraph = tf_export.TerraformResourceGraph{
 		{TerraformResourceHints: exportMysqlMysqlDbSystemHints},
 		{TerraformResourceHints: exportMysqlChannelHints},
 		{TerraformResourceHints: exportMysqlReplicaHints},
+		{TerraformResourceHints: exportMysqlBlueGreenDeploymentHints},
 	},
 }

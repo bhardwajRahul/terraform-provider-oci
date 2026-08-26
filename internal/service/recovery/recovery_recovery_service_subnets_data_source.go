@@ -20,7 +20,7 @@ func RecoveryRecoveryServiceSubnetsDataSource() *schema.Resource {
 			"filter": tfresource.DataSourceFiltersSchema(),
 			"compartment_id": {
 				Type:     schema.TypeString,
-				Required: true,
+				Optional: true,
 			},
 			"display_name": {
 				Type:     schema.TypeString,

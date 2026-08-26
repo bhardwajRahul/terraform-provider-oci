@@ -45,9 +45,17 @@ The following attributes are exported:
 
 The following attributes are exported:
 
-* `bds_cluster_version_summary` - Cluster version details including bds and odh version information.
-	* `bds_version` - BDS version to be used for cluster creation
-	* `odh_version` - ODH version to be used for cluster creation
+* `bds_capacity_reservation_configurations` - The list of BDS capacity reservation configurations associated with the cluster.
+	* `bds_capacity_reservation_id` - The OCID of the BDS capacity reservation associated with the BDS cluster.
+	* `bds_instance_id` - The OCID of the BDS cluster associated with the BDS capacity reservation.
+	* `display_name` - The display name of the BDS capacity reservation configuration.
+	* `id` - The OCID of the BDS capacity reservation configuration.
+	* `state` - The lifecycle state of the BDS capacity reservation configuration.
+	* `time_created` - The time the BDS capacity reservation configuration was created, shown as an RFC 3339 formatted datetime string.
+	* `time_updated` - The time the BDS capacity reservation configuration was updated, shown as an RFC 3339 formatted datetime string.
+* `bds_cluster_version_summary` - Cluster version details including BDS and ODH version information.
+	* `bds_version` - BDS version used for cluster creation.
+	* `odh_version` - ODH version used for cluster creation.
 * `bootstrap_script_url` - pre-authenticated URL of the bootstrap script in Object Store that can be downloaded and executed.
 * `cloud_sql_details` - The information about added Cloud SQL capability
 	* `block_volume_size_in_gbs` - The size of block volume in GB that needs to be attached to a given node. All the necessary details needed for attachment are managed by service itself. 
@@ -96,6 +104,7 @@ The following attributes are exported:
 		* `volume_size_in_gbs` - The size of the volume in GBs.
 	* `availability_domain` - The name of the availability domain in which the node is running.
 	* `certificate_configuration_id` - ID of the certificate configuration which is used to generate the certificate for the node.
+	* `compute_capacity_reservation_id` - The OCID of the Compute capacity reservation used by this node.
 	* `display_name` - The name of the node.
 	* `fault_domain` - The name of the fault domain in which the node is running.
 	* `hostname` - The fully-qualified hostname (FQDN) of the node.
@@ -124,4 +133,3 @@ The following attributes are exported:
 * `time_created` - The time the cluster was created, shown as an RFC 3339 formatted datetime string.
 * `time_earliest_certificate_expiration` - The earliest time of certificate expiration date across the certificates of all current nodes under this cluster.
 * `time_updated` - The time the cluster was updated, shown as an RFC 3339 formatted datetime string.
-

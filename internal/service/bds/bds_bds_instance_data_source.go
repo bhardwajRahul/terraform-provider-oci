@@ -66,6 +66,12 @@ func (s *BdsBdsInstanceDataSourceCrud) SetData() error {
 
 	s.D.SetId(*s.Res.Id)
 
+	bdsCapacityReservationConfigurations := []interface{}{}
+	for _, item := range s.Res.BdsCapacityReservationConfigurations {
+		bdsCapacityReservationConfigurations = append(bdsCapacityReservationConfigurations, BdsCapacityReservationConfigurationToMap(item))
+	}
+	s.D.Set("bds_capacity_reservation_configurations", bdsCapacityReservationConfigurations)
+
 	if s.Res.BdsClusterVersionSummary != nil {
 		s.D.Set("bds_cluster_version_summary", []interface{}{BdsClusterVersionSummaryToMap(s.Res.BdsClusterVersionSummary)})
 	} else {

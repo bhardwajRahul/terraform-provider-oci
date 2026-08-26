@@ -1,3 +1,14 @@
+## 8.29.0 (August 25, 2026)
+
+### Added
+- Support for ZPR Security Attribute Onboarding for RCV CP
+- Support for BDS 3.5.0 - Feature Enhancements
+- Support for MySQL HeatWave Service: Blue/Green Deployments
+
+### Bug Fix
+- Remove restrictive DNS zone validation
+- Send optional FastConnect update fields only when changed
+
 ## 8.28.0 (August 19, 2026)
 
 ### Added

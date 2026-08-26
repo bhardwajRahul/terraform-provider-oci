@@ -17,11 +17,11 @@ Gets a list of protection policies based on the specified parameters.
 
 ```hcl
 data "oci_recovery_protection_policies" "test_protection_policies" {
-	#Required
-	compartment_id = var.compartment_id
 
 	#Optional
+	compartment_id = var.compartment_id
 	display_name = var.protection_policy_display_name
+	must_enforce_cloud_locality = var.protection_policy_must_enforce_cloud_locality
 	owner = var.protection_policy_owner
 	protection_policy_id = oci_recovery_protection_policy.test_protection_policy.id
 	state = var.protection_policy_state
@@ -32,8 +32,9 @@ data "oci_recovery_protection_policies" "test_protection_policies" {
 
 The following arguments are supported:
 
-* `compartment_id` - (Required) The compartment OCID.
+* `compartment_id` - (Optional) The compartment OCID.
 * `display_name` - (Optional) A filter to return only resources that match the entire 'displayname' given.
+* `must_enforce_cloud_locality` - (Optional) A filter to return only the protection policies that enforce backup colocation (mustEnforceCloudLocality is set to TRUE).
 * `owner` - (Optional) A filter to return only the policies that match the owner as 'Customer' or 'Oracle'.
 * `protection_policy_id` - (Optional) The protection policy OCID.
 * `state` - (Optional) A filter to return only resources their lifecycleState matches the given lifecycleState.
