@@ -45,16 +45,13 @@ var (
 	}
 
 	BdsBdsInstanceResourcePrincipalConfigurationRepresentation = map[string]interface{}{
-		"bds_instance_id": acctest.Representation{RepType: acctest.Required, Create: `${oci_bds_bds_instance.test_bds_instance.id}`},
-		//	"cluster_admin_password": acctest.Representation{RepType: acctest.Optional, Create: `clusterAdminPassword`}, // Comment if secret_id is used.
-		"secret_id":    acctest.Representation{RepType: acctest.Optional, Create: `${var.secret_id}`},
+		"bds_instance_id":        acctest.Representation{RepType: acctest.Required, Create: `${oci_bds_bds_instance.test_bds_instance.id}`},
+		"cluster_admin_password": acctest.Representation{RepType: acctest.Required, Create: `T3JhY2xlVGVhbVVTQSExMjM=`},
+		// "secret_id":                                 acctest.Representation{RepType: acctest.Optional, Create: `${var.secret_id}`},
 		"display_name": acctest.Representation{RepType: acctest.Required, Create: `displayName`, Update: `displayName2`},
 		"session_token_life_span_duration_in_hours": acctest.Representation{RepType: acctest.Required, Create: `1`, Update: `11`},
 		"force_refresh_resource_principal_trigger":  acctest.Representation{RepType: acctest.Required, Create: `0`, Update: `1`},
 	}
-
-	//bdsinstanceId            = utils.GetEnvSettingWithBlankDefault("bdsinstance_ocid")
-	//bdsinstanceIdVariableStr = fmt.Sprintf("variable \"bdsinstance_id\" { default = \"%s\" }\n", bdsinstanceId)
 
 	BdsBdsInstanceResourcePrincipalConfigurationResourceDependencies = acctest.GenerateResourceFromRepresentationMap("oci_bds_bds_instance", "test_bds_instance", acctest.Optional, acctest.Create, bdsInstanceRepresentation)
 )
@@ -75,8 +72,8 @@ func TestBdsBdsInstanceResourcePrincipalConfigurationResource_basic(t *testing.T
 	//bdsinstanceId := utils.GetEnvSettingWithBlankDefault("bdsinstance_ocid")
 	//bdsinstanceIdVariableStr := fmt.Sprintf("variable \"bdsinstance_id\" { default = \"%s\" }\n", bdsinstanceId)
 
-	secret_id := utils.GetEnvSettingWithBlankDefault("secret_ocid")
-	secretIdVariableStr := fmt.Sprintf("variable \"secret_id\" { default = \"%s\" }\n", secret_id)
+	//secret_id := utils.GetEnvSettingWithBlankDefault("secret_ocid")
+	//secretIdVariableStr := fmt.Sprintf("variable \"secret_id\" { default = \"%s\" }\n", secret_id)
 
 	resourceName := "oci_bds_bds_instance_resource_principal_configuration.test_bds_instance_resource_principal_configuration"
 	datasourceName := "data.oci_bds_bds_instance_resource_principal_configurations.test_bds_instance_resource_principal_configurations"
@@ -91,11 +88,11 @@ func TestBdsBdsInstanceResourcePrincipalConfigurationResource_basic(t *testing.T
 
 		// verify Create
 		{
-			Config: config + compartmentIdVariableStr + subnetIdVariableStr + secretIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceDependencies +
+			Config: config + compartmentIdVariableStr + subnetIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceDependencies +
 				acctest.GenerateResourceFromRepresentationMap("oci_bds_bds_instance_resource_principal_configuration", "test_bds_instance_resource_principal_configuration", acctest.Optional, acctest.Create, BdsBdsInstanceResourcePrincipalConfigurationRepresentation),
 			Check: acctest.ComposeAggregateTestCheckFuncWrapper(
 				resource.TestCheckResourceAttrSet(resourceName, "bds_instance_id"),
-				//	resource.TestCheckResourceAttr(resourceName, "cluster_admin_password", "clusterAdminPassword"), // Comment if secret_id is used.
+				resource.TestCheckResourceAttr(resourceName, "cluster_admin_password", "T3JhY2xlVGVhbVVTQSExMjM="),
 				resource.TestCheckResourceAttr(resourceName, "display_name", "displayName"),
 				resource.TestCheckResourceAttrSet(resourceName, "id"),
 				resource.TestCheckResourceAttr(resourceName, "session_token_life_span_duration_in_hours", "1"),
@@ -117,14 +114,14 @@ func TestBdsBdsInstanceResourcePrincipalConfigurationResource_basic(t *testing.T
 
 		// verify updates to updatable parameters
 		{
-			Config: config + compartmentIdVariableStr + subnetIdVariableStr + secretIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceDependencies +
+			Config: config + compartmentIdVariableStr + subnetIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceDependencies +
 				acctest.GenerateResourceFromRepresentationMap("oci_bds_bds_instance_resource_principal_configuration", "test_bds_instance_resource_principal_configuration", acctest.Optional, acctest.Update, BdsBdsInstanceResourcePrincipalConfigurationRepresentation),
 			Check: acctest.ComposeAggregateTestCheckFuncWrapper(
 				resource.TestCheckResourceAttrSet(resourceName, "bds_instance_id"),
-				//	resource.TestCheckResourceAttr(resourceName, "cluster_admin_password", "clusterAdminPassword"), // Comment if secret_id is used.
+				resource.TestCheckResourceAttr(resourceName, "cluster_admin_password", "T3JhY2xlVGVhbVVTQSExMjM="),
 				resource.TestCheckResourceAttr(resourceName, "display_name", "displayName2"),
 				resource.TestCheckResourceAttrSet(resourceName, "id"),
-				resource.TestCheckResourceAttrSet(resourceName, "secret_id"),
+				// resource.TestCheckResourceAttrSet(resourceName, "secret_id"),
 				resource.TestCheckResourceAttr(resourceName, "session_token_life_span_duration_in_hours", "11"),
 				resource.TestCheckResourceAttrSet(resourceName, "state"),
 				resource.TestCheckResourceAttrSet(resourceName, "time_created"),
@@ -143,7 +140,7 @@ func TestBdsBdsInstanceResourcePrincipalConfigurationResource_basic(t *testing.T
 		{
 			Config: config +
 				acctest.GenerateDataSourceFromRepresentationMap("oci_bds_bds_instance_resource_principal_configurations", "test_bds_instance_resource_principal_configurations", acctest.Optional, acctest.Update, BdsBdsInstanceResourcePrincipalConfigurationDataSourceRepresentation) +
-				compartmentIdVariableStr + subnetIdVariableStr + secretIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceDependencies +
+				compartmentIdVariableStr + subnetIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceDependencies +
 				acctest.GenerateResourceFromRepresentationMap("oci_bds_bds_instance_resource_principal_configuration", "test_bds_instance_resource_principal_configuration", acctest.Optional, acctest.Update, BdsBdsInstanceResourcePrincipalConfigurationRepresentation),
 			Check: acctest.ComposeAggregateTestCheckFuncWrapper(
 				resource.TestCheckResourceAttrSet(datasourceName, "bds_instance_id"),
@@ -165,7 +162,7 @@ func TestBdsBdsInstanceResourcePrincipalConfigurationResource_basic(t *testing.T
 		{
 			Config: config +
 				acctest.GenerateDataSourceFromRepresentationMap("oci_bds_bds_instance_resource_principal_configuration", "test_bds_instance_resource_principal_configuration", acctest.Optional, acctest.Create, BdsBdsInstanceResourcePrincipalConfigurationSingularDataSourceRepresentation) +
-				compartmentIdVariableStr + subnetIdVariableStr + secretIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceConfig,
+				compartmentIdVariableStr + subnetIdVariableStr + BdsBdsInstanceResourcePrincipalConfigurationResourceConfig,
 			Check: acctest.ComposeAggregateTestCheckFuncWrapper(
 				resource.TestCheckResourceAttrSet(singularDatasourceName, "bds_instance_id"),
 				resource.TestCheckResourceAttrSet(singularDatasourceName, "resource_principal_configuration_id"),
@@ -187,8 +184,8 @@ func TestBdsBdsInstanceResourcePrincipalConfigurationResource_basic(t *testing.T
 			ImportStateVerify: true,
 			ImportStateIdFunc: getBdsResourcePrincipalConfigurationCompositeId(resourceName),
 			ImportStateVerifyIgnore: []string{
-				"secret_id",
-				//			"cluster_admin_password", // Comment if secret_id is used.
+				"cluster_admin_password",
+				// "secret_id",
 				"force_refresh_resource_principal_trigger",
 			},
 			ResourceName: resourceName,

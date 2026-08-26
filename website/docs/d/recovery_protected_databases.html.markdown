@@ -17,10 +17,10 @@ Lists the protected databases based on the specified parameters.
 
 ```hcl
 data "oci_recovery_protected_databases" "test_protected_databases" {
-	#Required
-	compartment_id = var.compartment_id
 
 	#Optional
+	backup_cloud_location = var.protected_database_backup_cloud_location
+	compartment_id = var.compartment_id
 	display_name = var.protected_database_display_name
 	id = var.protected_database_id
 	protection_policy_id = oci_recovery_protection_policy.test_protection_policy.id
@@ -33,7 +33,8 @@ data "oci_recovery_protected_databases" "test_protected_databases" {
 
 The following arguments are supported:
 
-* `compartment_id` - (Required) The compartment OCID.
+* `backup_cloud_location` - (Optional) Filter for cloud location of protected database.
+* `compartment_id` - (Optional) The compartment OCID.
 * `display_name` - (Optional) A filter to return only resources that match the entire 'displayname' given.
 * `id` - (Optional) The protected database OCID.
 * `protection_policy_id` - (Optional) The protection policy OCID.
@@ -51,6 +52,7 @@ The following attributes are exported:
 
 The following attributes are exported:
 
+* `backup_cloud_location` - Indicates the cloud service environment where the protected database is provisioned. For example, Oracle Cloud or Microsoft Azure.
 * `compartment_id` - The OCID of the compartment that contains the protected database.
 * `database_id` - The OCID of the protected database.
 * `database_size` - The size of the protected database. XS - Less than 5GB, S - 5GB to 50GB, M - 50GB to 500GB, L - 500GB to 1TB, XL - 1TB to 5TB, XXL - Greater than 5TB.

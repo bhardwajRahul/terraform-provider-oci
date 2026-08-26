@@ -86,6 +86,12 @@ func (s *RecoveryRecoveryServiceSubnetDataSourceCrud) SetData() error {
 
 	s.D.Set("nsg_ids", s.Res.NsgIds)
 
+	securityAttributes, err := flattenRecoveryServiceSubnetSecurityAttributes(s.Res.SecurityAttributes)
+	if err != nil {
+		return err
+	}
+	s.D.Set("security_attributes", securityAttributes)
+
 	s.D.Set("state", s.Res.LifecycleState)
 
 	if s.Res.SubnetId != nil {

@@ -8,8 +8,10 @@ import "github.com/oracle/terraform-provider-oci/internal/tfresource"
 func RegisterResource() {
 	tfresource.RegisterResource("oci_bds_auto_scaling_configuration", BdsAutoScalingConfigurationResource())
 	tfresource.RegisterResource("oci_bds_bds_capacity_report", BdsBdsCapacityReportResource())
+	tfresource.RegisterResource("oci_bds_bds_capacity_reservation", BdsBdsCapacityReservationResource())
 	tfresource.RegisterResource("oci_bds_bds_instance", BdsBdsInstanceResource())
 	tfresource.RegisterResource("oci_bds_bds_instance_api_key", BdsBdsInstanceApiKeyResource())
+	tfresource.RegisterResource("oci_bds_bds_instance_bds_capacity_reservation_configuration", BdsBdsInstanceBdsCapacityReservationConfigurationResource())
 	tfresource.RegisterResource("oci_bds_bds_instance_bds_certificate_configuration", BdsBdsInstanceBdsCertificateConfigurationResource())
 	tfresource.RegisterResource("oci_bds_bds_instance_identity_configuration", BdsBdsInstanceIdentityConfigurationResource())
 	tfresource.RegisterResource("oci_bds_bds_instance_metastore_config", BdsBdsInstanceMetastoreConfigResource())

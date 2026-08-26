@@ -503,7 +503,7 @@ func (s *CoreCrossConnectResourceCrud) Update() error {
 		request.FreeformTags = tfresource.ObjectMapToStringMap(freeformTags.(map[string]interface{}))
 	}
 
-	if interfaceDownTimerValueInMilliseconds, ok := s.D.GetOkExists("interface_down_timer_value_in_milliseconds"); ok {
+	if interfaceDownTimerValueInMilliseconds, ok := s.D.GetOkExists("interface_down_timer_value_in_milliseconds"); ok && s.D.HasChange("interface_down_timer_value_in_milliseconds") {
 		tmp := interfaceDownTimerValueInMilliseconds.(int)
 		request.InterfaceDownTimerValueInMilliseconds = &tmp
 	}
@@ -517,7 +517,7 @@ func (s *CoreCrossConnectResourceCrud) Update() error {
 		}
 	}
 
-	if isInterfaceHoldTimerEnabled, ok := s.D.GetOkExists("is_interface_hold_timer_enabled"); ok {
+	if isInterfaceHoldTimerEnabled, ok := s.D.GetOkExists("is_interface_hold_timer_enabled"); ok && s.D.HasChange("is_interface_hold_timer_enabled") {
 		tmp := isInterfaceHoldTimerEnabled.(bool)
 		request.IsInterfaceHoldTimerEnabled = &tmp
 	}

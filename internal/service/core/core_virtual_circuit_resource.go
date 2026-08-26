@@ -603,7 +603,7 @@ func (s *CoreVirtualCircuitResourceCrud) Update() error {
 		request.BandwidthShapeName = &tmp
 	}
 
-	if bgpAdminState, ok := s.D.GetOkExists("bgp_admin_state"); ok {
+	if bgpAdminState, ok := s.D.GetOkExists("bgp_admin_state"); ok && s.D.HasChange("bgp_admin_state") {
 		request.BgpAdminState = oci_core.UpdateVirtualCircuitDetailsBgpAdminStateEnum(bgpAdminState.(string))
 	}
 
@@ -664,13 +664,13 @@ func (s *CoreVirtualCircuitResourceCrud) Update() error {
 		request.IpMtu = oci_core.VirtualCircuitIpMtuEnum(ipMtu.(string))
 	}
 
-	if isBfdEnabled, ok := s.D.GetOkExists("is_bfd_enabled"); ok {
+	if isBfdEnabled, ok := s.D.GetOkExists("is_bfd_enabled"); ok && s.D.HasChange("is_bfd_enabled") {
 		tmp := isBfdEnabled.(bool)
 		request.IsBfdEnabled = &tmp
 	}
 
 	if vcType, ok := s.D.GetOkExists("type"); ok && !strings.EqualFold(vcType.(string), string(oci_core.VirtualCircuitTypePublic)) {
-		if isTransportMode, ok := s.D.GetOkExists("is_transport_mode"); ok {
+		if isTransportMode, ok := s.D.GetOkExists("is_transport_mode"); ok && s.D.HasChange("is_transport_mode") {
 			tmp := isTransportMode.(bool)
 			request.IsTransportMode = &tmp
 		}
@@ -701,7 +701,7 @@ func (s *CoreVirtualCircuitResourceCrud) Update() error {
 		}
 	}
 
-	if trafficMode, ok := s.D.GetOkExists("traffic_mode"); ok {
+	if trafficMode, ok := s.D.GetOkExists("traffic_mode"); ok && s.D.HasChange("traffic_mode") {
 		request.TrafficMode = oci_core.UpdateVirtualCircuitDetailsTrafficModeEnum(trafficMode.(string))
 	}
 
