@@ -294,7 +294,7 @@ github.com/mitchellh/reflectwalk
 # github.com/oklog/run v1.2.0
 ## explicit; go 1.20
 github.com/oklog/run
-# github.com/oracle/oci-go-sdk/v65 v65.124.0
+# github.com/oracle/oci-go-sdk/v65 v65.124.1
 ## explicit; go 1.25.0
 github.com/oracle/oci-go-sdk/v65/adm
 github.com/oracle/oci-go-sdk/v65/aidataplatform
@@ -324,6 +324,7 @@ github.com/oracle/oci-go-sdk/v65/certificatesmanagement
 github.com/oracle/oci-go-sdk/v65/cloudbridge
 github.com/oracle/oci-go-sdk/v65/cloudguard
 github.com/oracle/oci-go-sdk/v65/cloudmigrations
+github.com/oracle/oci-go-sdk/v65/clusterhealth
 github.com/oracle/oci-go-sdk/v65/clusterplacementgroups
 github.com/oracle/oci-go-sdk/v65/common
 github.com/oracle/oci-go-sdk/v65/common/auth
@@ -355,7 +356,6 @@ github.com/oracle/oci-go-sdk/v65/desktops
 github.com/oracle/oci-go-sdk/v65/devops
 github.com/oracle/oci-go-sdk/v65/dif
 github.com/oracle/oci-go-sdk/v65/disasterrecovery
-github.com/oracle/oci-go-sdk/v65/distributeddatabase
 github.com/oracle/oci-go-sdk/v65/dns
 github.com/oracle/oci-go-sdk/v65/email
 github.com/oracle/oci-go-sdk/v65/emwarehouse

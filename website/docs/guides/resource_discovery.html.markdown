@@ -148,6 +148,7 @@ Make sure the `output_path` is empty before running resource discovery
     * `cloud_bridge` - Discovers cloud_bridge resources within the specified compartment
     * `cloud_guard` - Discovers cloud guard resources within the specified compartment
     * `cloud_migrations` - Discovers cloud_migrations resources within the specified compartment
+    * `cluster_health` - Discovers cluster_health resources within the specified compartment
     * `cluster_placement_groups` - Discovers cluster_placement_groups resources within the specified compartment
     * `compute_cloud_at_customer` - Discovers compute_cloud_at_customer resources within the specified compartment
     * `container_instances` - Discovers container_instances resources within the specified compartment
@@ -172,7 +173,6 @@ Make sure the `output_path` is empty before running resource discovery
     * `devops` - Discovers devops resources within the specified compartment
     * `dif` - Discovers dif resources within the specified compartment
     * `disaster_recovery` - Discovers disaster_recovery resources within the specified compartment
-    * `distributed_database` - Discovers distributed_database resources within the specified compartment
     * `dns` - Discovers dns resources (except record) within the specified compartment
     * `email` - Discovers email_sender resources within the specified compartment
     * `events` - Discovers events resources within the specified compartment
@@ -535,6 +535,10 @@ cloud_migrations
 * oci\_cloud\_migrations\_migration
 * oci\_cloud\_migrations\_replication\_schedule
 
+cluster_health
+
+* oci\_cluster\_health\_diagnosis\_store
+
 cluster_placement_groups
 
 * oci\_cluster\_placement\_groups\_cluster\_placement\_group
@@ -868,12 +872,6 @@ disaster_recovery
 * oci\_disaster\_recovery\_dr\_plan\_execution
 * oci\_disaster\_recovery\_dr\_plan
 
-distributed_database
-
-* oci\_distributed\_database\_distributed\_database
-* oci\_distributed\_database\_distributed\_database\_private\_endpoint
-* oci\_distributed\_database\_distributed\_autonomous\_database
-
 dns
 
 * oci\_dns\_zone
@@ -1074,6 +1072,8 @@ iot
 * oci\_iot\_digital\_twin\_relationship
 * oci\_iot\_digital\_twin\_instance
 * oci\_iot\_digital\_twin\_adapter
+* oci\_iot\_iot\_flow\_runtime\_flow
+* oci\_iot\_iot\_flow\_runtime
 
 jms
 
@@ -1415,7 +1415,7 @@ security_attribute
 * oci\_security\_attribute\_security\_attribute
 
 self
-    
+
 * oci\_self\_subscription
 
 stack_monitoring

@@ -135,7 +135,6 @@ resource "oci_database_db_system" "test_db_system" {
 	}
 	hostname = var.db_system_hostname
 	shape = var.db_system_shape
-	ssh_public_keys = var.db_system_ssh_public_keys
 	subnet_id = oci_core_subnet.test_subnet.id
 
 	#Optional
@@ -202,6 +201,7 @@ resource "oci_database_db_system" "test_db_system" {
 	source = var.db_system_source
 	source_db_system_id = oci_database_db_system.test_db_system.id
 	sparse_diskgroup = var.db_system_sparse_diskgroup
+	ssh_public_keys = var.db_system_ssh_public_keys
 	storage_volume_performance_mode = var.db_system_storage_volume_performance_mode
 	time_zone = var.db_system_time_zone
 }
@@ -390,8 +390,8 @@ The following arguments are supported:
 * `source` - (Optional) The source of the database: Use `NONE` for creating a new database. Use `DB_BACKUP` for creating a new database by restoring from a backup. Use `DATABASE` for creating a new database from an existing database, including archive redo log data. The default is `NONE`.
 * `source_db_system_id` - (Required when source=DB_SYSTEM) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the DB system.
 * `sparse_diskgroup` - (Optional) If true, Sparse Diskgroup is configured for Exadata dbsystem. If False, Sparse diskgroup is not configured. Only applied for Exadata shape.
-* `ssh_public_keys` - (Required) (Updatable) The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.
-* `storage_volume_performance_mode` - (Optional) The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance](https://docs.cloud.oracle.com/iaas/Content/Block/Concepts/blockvolumeperformance.htm) for more information.
+* `ssh_public_keys` - (Optional) (Updatable) The public key portion of the key pair to use for SSH access to the DB system. Multiple public keys can be provided. The length of the combined keys cannot exceed 40,000 characters.
+* `storage_volume_performance_mode` - (Optional) The block storage volume performance level. Valid values are `BALANCED` and `HIGH_PERFORMANCE`. See [Block Volume Performance](https://docs.cloud.oracle.com/iaas/Content/Block/Concepts/blockvolumeperformance.htm) for more information. 
 * `subnet_id` - (Required) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the subnet the DB system is associated with.
 
 	**Subnet Restrictions:**

@@ -34,7 +34,7 @@ The following arguments are supported:
 
 * `display_name` - (Optional) Filter resources whose display name matches the specified value. 
 * `id` - (Optional) Filter resources by [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm). Must be a valid OCID of the resource type. 
-* `iot_domain_id` - (Required) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the IoT domain in which to list digital twin resources. 
+* `iot_domain_id` - (Required) The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the IoT domain in which to list IoT resources. 
 * `spec_uri_starts_with` - (Optional) Filters resources by spec URI prefix. For example, to search all versions of the `dtmi:example:device;1` model, pass the prefix without the version: `dtmi:example:device`. 
 * `state` - (Optional) Filter resources whose lifecycleState matches the specified value. 
 

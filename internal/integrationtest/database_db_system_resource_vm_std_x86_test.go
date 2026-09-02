@@ -69,6 +69,25 @@ var (
 		"name":   acctest.Representation{RepType: acctest.Required, Create: `id`},
 		"values": acctest.Representation{RepType: acctest.Required, Create: []string{`${oci_database_db_system.test_vm_std_x86_db_system.id}`}},
 	}
+
+	DbSystemVmStdx86RepresentationNoSsh = map[string]interface{}{
+		"availability_domain":     acctest.Representation{RepType: acctest.Required, Create: `${data.oci_identity_availability_domains.test_availability_domains.availability_domains.0.name}`},
+		"compartment_id":          acctest.Representation{RepType: acctest.Required, Create: `${var.compartment_id}`},
+		"subnet_id":               acctest.Representation{RepType: acctest.Required, Create: `${oci_core_subnet.test_subnet.id}`},
+		"database_edition":        acctest.Representation{RepType: acctest.Required, Create: `ENTERPRISE_EDITION`},
+		"disk_redundancy":         acctest.Representation{RepType: acctest.Required, Create: `NORMAL`},
+		"shape":                   acctest.Representation{RepType: acctest.Required, Create: `VM.Standard.x86`},
+		"compute_model":           acctest.Representation{RepType: acctest.Required, Create: `ECPU`},
+		"compute_count":           acctest.Representation{RepType: acctest.Required, Create: `4`},
+		"domain":                  acctest.Representation{RepType: acctest.Required, Create: `${oci_core_subnet.test_subnet.subnet_domain_name}`},
+		"hostname":                acctest.Representation{RepType: acctest.Required, Create: `myOracleDB1`},
+		"data_storage_size_in_gb": acctest.Representation{RepType: acctest.Required, Create: `256`},
+		"license_model":           acctest.Representation{RepType: acctest.Required, Create: `LICENSE_INCLUDED`},
+		"node_count":              acctest.Representation{RepType: acctest.Required, Create: `1`},
+		"display_name":            acctest.Representation{RepType: acctest.Required, Create: `tfDbSystemVmStdx86_1`},
+		"db_system_options":       acctest.RepresentationGroup{RepType: acctest.Optional, Group: DbSystemOptionsx86},
+		"db_home":                 acctest.RepresentationGroup{RepType: acctest.Required, Group: DbSystemDbHomeGroupx86},
+	}
 )
 
 func TestResourceDatabaseDBSystemVMStdx86(t *testing.T) {
@@ -76,6 +95,7 @@ func TestResourceDatabaseDBSystemVMStdx86(t *testing.T) {
 	defer httpreplay.SaveScenario()
 
 	resourceName := "oci_database_db_system.test_vm_std_x86_db_system"
+	resourceName2 := "oci_database_db_system.test_vm_std_x86_db_system_no_ssh"
 	datasourceName := "data.oci_database_db_systems.test_vm_std_x86_db_systems"
 	var resId, resId2 string
 
@@ -143,6 +163,30 @@ func TestResourceDatabaseDBSystemVMStdx86(t *testing.T) {
 					}
 					return nil
 				},
+			),
+		},
+		// verify create no ssh
+		{
+			Config: ResourceDatabaseBaseConfig +
+				acctest.GenerateResourceFromRepresentationMap("oci_database_db_system", "test_vm_std_x86_db_system_no_ssh", acctest.Optional, acctest.Create, DbSystemVmStdx86RepresentationNoSsh),
+			Check: acctest.ComposeAggregateTestCheckFuncWrapper(
+				// DB System Resource tests
+				resource.TestCheckResourceAttrSet(resourceName2, "id"),
+				resource.TestCheckResourceAttrSet(resourceName2, "availability_domain"),
+				resource.TestCheckResourceAttrSet(resourceName2, "compartment_id"),
+				resource.TestCheckResourceAttrSet(resourceName2, "time_created"),
+				resource.TestCheckResourceAttr(resourceName2, "storage_volume_performance_mode", "HIGH_PERFORMANCE"),
+				resource.TestCheckResourceAttr(resourceName2, "disk_redundancy", "NORMAL"),
+				resource.TestCheckResourceAttr(resourceName2, "shape", "VM.Standard.x86"),
+				resource.TestCheckResourceAttr(resourceName2, "compute_model", "ECPU"),
+				resource.TestCheckResourceAttr(resourceName2, "compute_count", "4"),
+				resource.TestCheckResourceAttr(resourceName2, "ssh_public_keys.#", "0"),
+				resource.TestCheckResourceAttr(resourceName2, "data_storage_size_in_gb", "256"),
+				resource.TestCheckResourceAttr(resourceName2, "license_model", "LICENSE_INCLUDED"),
+				resource.TestCheckResourceAttr(resourceName2, "node_count", "1"),
+				resource.TestCheckResourceAttrSet(resourceName2, "db_home.0.db_version"),
+				resource.TestCheckResourceAttrSet(resourceName2, "db_home.0.display_name"),
+				resource.TestCheckResourceAttr(resourceName2, "system_tags.%", "0"),
 			),
 		},
 		//verify datasource

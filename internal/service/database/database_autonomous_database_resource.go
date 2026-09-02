@@ -124,6 +124,16 @@ func DatabaseAutonomousDatabaseResource() *schema.Resource {
 						},
 
 						// Optional
+						"availability_domain": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+						"is_maintenance_window_change_scheduled": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
 						"maintenance_end_time": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -1496,6 +1506,60 @@ func DatabaseAutonomousDatabaseResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Computed: true,
 			},
+			"scheduled_maintenance_window": {
+				Type:     schema.TypeList,
+				Optional: true,
+				Computed: true,
+				MaxItems: 1,
+				MinItems: 1,
+				Elem: &schema.Resource{
+					Schema: map[string]*schema.Schema{
+						// Required
+
+						// Optional
+						"day_of_week": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Computed: true,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									// Required
+									"name": {
+										Type:     schema.TypeString,
+										Required: true,
+									},
+
+									// Optional
+
+									// Computed
+								},
+							},
+						},
+						"availability_domain": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+						"is_maintenance_window_change_scheduled": {
+							Type:     schema.TypeBool,
+							Optional: true,
+							Computed: true,
+						},
+						"maintenance_end_time": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+						"maintenance_start_time": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
+
+						// Computed
+					},
+				},
+			},
 			"service_console_url": {
 				Type:     schema.TypeString,
 				Computed: true,
@@ -1660,6 +1724,12 @@ func DatabaseAutonomousDatabaseResource() *schema.Resource {
 				DiffSuppressFunc: tfresource.TimeDiffSuppressFunction,
 			},
 			"time_scheduled_db_version_upgrade": {
+				Type:             schema.TypeString,
+				Computed:         true,
+				Optional:         true,
+				DiffSuppressFunc: tfresource.TimeDiffSuppressFunction,
+			},
+			"time_scheduled_maintenance_window_update": {
 				Type:             schema.TypeString,
 				Computed:         true,
 				Optional:         true,
@@ -2573,6 +2643,17 @@ func (s *DatabaseAutonomousDatabaseResourceCrud) UpdateWithContext(ctx context.C
 		}
 	}
 
+	if scheduledMaintenanceWindow, ok := s.D.GetOkExists("scheduled_maintenance_window"); ok && s.D.HasChange("scheduled_maintenance_window") {
+		if tmpList := scheduledMaintenanceWindow.([]interface{}); len(tmpList) > 0 {
+			fieldKeyFormat := fmt.Sprintf("%s.%d.%%s", "scheduled_maintenance_window", 0)
+			tmp, err := s.mapToAutonomousDatabaseMaintenanceWindowSummary(fieldKeyFormat)
+			if err != nil {
+				return err
+			}
+			request.ScheduledMaintenanceWindow = &tmp
+		}
+	}
+
 	if scheduledOperations, ok := s.D.GetOkExists("scheduled_operations"); ok && s.D.HasChange("scheduled_operations") {
 		set := scheduledOperations.(*schema.Set)
 		interfaces := set.List()
@@ -2670,6 +2751,14 @@ func (s *DatabaseAutonomousDatabaseResourceCrud) UpdateWithContext(ctx context.C
 			return err
 		}
 		request.TimeOfAutoRefreshStart = &oci_common.SDKTime{Time: tmp}
+	}
+
+	if timeScheduledMaintenanceWindowUpdate, ok := s.D.GetOkExists("time_scheduled_maintenance_window_update"); ok && s.D.HasChange("time_scheduled_maintenance_window_update") {
+		tmp, err := time.Parse(time.RFC3339, timeScheduledMaintenanceWindowUpdate.(string))
+		if err != nil {
+			return err
+		}
+		request.TimeScheduledMaintenanceWindowUpdate = &oci_common.SDKTime{Time: tmp}
 	}
 
 	if vanityUrlDetails, ok := s.D.GetOkExists("vanity_url_details"); ok && s.D.HasChange("vanity_url_details") {
@@ -3158,6 +3247,10 @@ func (s *DatabaseAutonomousDatabaseResourceCrud) SetData() error {
 
 	s.D.Set("role", s.Res.Role)
 
+	if s.Res.ScheduledMaintenanceWindow != nil {
+		s.D.Set("scheduled_maintenance_window", []interface{}{AutonomousDatabaseMaintenanceWindowSummaryToMap(s.Res.ScheduledMaintenanceWindow)})
+	}
+
 	scheduledOperations := []interface{}{}
 	for _, item := range s.Res.ScheduledOperations {
 		scheduledOperations = append(scheduledOperations, ScheduledOperationDetailsToMap(item))
@@ -3284,6 +3377,10 @@ func (s *DatabaseAutonomousDatabaseResourceCrud) SetData() error {
 
 	if s.Res.TimeScheduledDbVersionUpgrade != nil {
 		s.D.Set("time_scheduled_db_version_upgrade", s.Res.TimeScheduledDbVersionUpgrade.Format(time.RFC3339))
+	}
+
+	if s.Res.TimeScheduledMaintenanceWindowUpdate != nil {
+		s.D.Set("time_scheduled_maintenance_window_update", s.Res.TimeScheduledMaintenanceWindowUpdate.Format(time.RFC3339))
 	}
 
 	if s.Res.TimeUndeleted != nil {
@@ -3705,6 +3802,11 @@ func AutonomousDatabaseKeyHistoryEntryToMap(obj oci_database.AutonomousDatabaseK
 func (s *DatabaseAutonomousDatabaseResourceCrud) mapToAutonomousDatabaseMaintenanceWindowSummary(fieldKeyFormat string) (oci_database.AutonomousDatabaseMaintenanceWindowSummary, error) {
 	result := oci_database.AutonomousDatabaseMaintenanceWindowSummary{}
 
+	if availabilityDomain, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "availability_domain")); ok {
+		tmp := availabilityDomain.(string)
+		result.AvailabilityDomain = &tmp
+	}
+
 	if dayOfWeek, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "day_of_week")); ok {
 		if tmpList := dayOfWeek.([]interface{}); len(tmpList) > 0 {
 			fieldKeyFormatNextLevel := fmt.Sprintf("%s.%d.%%s", fmt.Sprintf(fieldKeyFormat, "day_of_week"), 0)
@@ -3714,6 +3816,11 @@ func (s *DatabaseAutonomousDatabaseResourceCrud) mapToAutonomousDatabaseMaintena
 			}
 			result.DayOfWeek = &tmp
 		}
+	}
+
+	if isMaintenanceWindowChangeScheduled, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "is_maintenance_window_change_scheduled")); ok {
+		tmp := isMaintenanceWindowChangeScheduled.(bool)
+		result.IsMaintenanceWindowChangeScheduled = &tmp
 	}
 
 	if maintenanceEndTime, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "maintenance_end_time")); ok {
@@ -3732,8 +3839,16 @@ func (s *DatabaseAutonomousDatabaseResourceCrud) mapToAutonomousDatabaseMaintena
 func AutonomousDatabaseMaintenanceWindowSummaryToMap(obj *oci_database.AutonomousDatabaseMaintenanceWindowSummary) map[string]interface{} {
 	result := map[string]interface{}{}
 
+	if obj.AvailabilityDomain != nil {
+		result["availability_domain"] = string(*obj.AvailabilityDomain)
+	}
+
 	if obj.DayOfWeek != nil {
 		result["day_of_week"] = []interface{}{AdbDayOfWeekToMap(obj.DayOfWeek)}
+	}
+
+	if obj.IsMaintenanceWindowChangeScheduled != nil {
+		result["is_maintenance_window_change_scheduled"] = bool(*obj.IsMaintenanceWindowChangeScheduled)
 	}
 
 	if obj.MaintenanceEndTime != nil {

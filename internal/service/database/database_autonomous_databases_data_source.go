@@ -588,6 +588,10 @@ func (s *DatabaseAutonomousDatabasesDataSourceCrud) SetData() error {
 
 		autonomousDatabase["role"] = r.Role
 
+		if r.ScheduledMaintenanceWindow != nil {
+			autonomousDatabase["scheduled_maintenance_window"] = []interface{}{AutonomousDatabaseMaintenanceWindowSummaryToMap(r.ScheduledMaintenanceWindow)}
+		}
+
 		scheduledOperations := []interface{}{}
 		for _, item := range r.ScheduledOperations {
 			scheduledOperations = append(scheduledOperations, ScheduledOperationDetailsToMap(item))
@@ -714,6 +718,10 @@ func (s *DatabaseAutonomousDatabasesDataSourceCrud) SetData() error {
 
 		if r.TimeScheduledDbVersionUpgrade != nil {
 			autonomousDatabase["time_scheduled_db_version_upgrade"] = r.TimeScheduledDbVersionUpgrade.String()
+		}
+
+		if r.TimeScheduledMaintenanceWindowUpdate != nil {
+			autonomousDatabase["time_scheduled_maintenance_window_update"] = r.TimeScheduledMaintenanceWindowUpdate.Format(time.RFC3339)
 		}
 
 		if r.TimeUndeleted != nil {

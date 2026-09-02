@@ -1,3 +1,15 @@
+## 9.0.0 (September 2, 2026)
+
+### Added
+- Fix for outdated OCI tutorial link and always-free TLS certificate example
+- Support for OCI IoT Service: IoT Flow Runtime (Node-RED)
+- Support for Quick Launch option for BaseDB
+- Support for In Tenancy Validation (ITV) Control Plane Service
+- Support for ADB-S: Ability to Change Maintenance Window Post Provisioning
+
+### Removed
+- Removed Terraform Support for distributed_database
+
 ## 8.29.0 (August 25, 2026)
 
 ### Added
