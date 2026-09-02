@@ -41,7 +41,7 @@ The following attributes are exported:
 * `id` - The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the resource.
 * `inbound_envelope` - Payload containing device-specific metadata and optional value mappings used to interpret or transform that metadata. This structure includes the device endpoint, the actual payload, and an optional envelope mapping that applies [JQ](https://stedolan.github.io/jq/) expressions to extract or reshape the data as needed. 
 	* `envelope_mapping` - Maps the metadata fields from the inbound payload using JQ. These mappings allow you to extract specific metadata such as timestamps using JQ expressions. 
-		* `content_root` - JSON Path string to override the context root before delegating to the adapter of the target digital twin instance.
+		* `content_root` - JSON Path string to override the context root before delegating to the adapter of the target digital twin instance. 
 		* `target` - Optional. JQ expression to map the target resource, which is externalKey of digital twin instance, the incoming data belongs to. 
 		* `time_observed` - JQ expression to extract the observation timestamp from the payload. If not specified, the system will default to using `timeReceived` as the timestamp.  Example: For payload `{"time": "<timestamp>","temp": 65,"hum": 55}` 'timeObserved' can be mapped as [JQ Expression](https://jqplay.org/) `$.time`. 
 	* `reference_endpoint` - The device endpoint. 
@@ -50,6 +50,7 @@ The following attributes are exported:
 		* `data_format` - Data format of the payload.
 * `inbound_routes` - list of routes
 	* `condition` - A boolean expression used to determine whether the following transformation should be processed for the incoming payload. This expression is typically based on fields defined at the inbound Envelope and is evaluated before applying the `payloadMapping`. 
+	* `content_root` - JSON Path string to override the context root before delegating to the adapter of the target digital twin instance. 
 	* `description` - Meaningful write up about the inbound route. 
 	* `payload_mapping` - A set of key-value JQ expressions used to transform the incoming payload into a shape compatible with the digital twin model's context or schema.
 
@@ -59,6 +60,7 @@ The following attributes are exported:
 	* `reference_payload` - Reference payload structure template received from IoT device. This payload must specify its content type using the `dataFormat` property. 
 		* `data` - JSON raw data.
 		* `data_format` - Data format of the payload.
+	* `target` - Optional. JQ expression to map the target resource, which is externalKey of digital twin instance, the incoming data belongs to. 
 * `iot_domain_id` - The [OCID](https://docs.cloud.oracle.com/iaas/Content/General/Concepts/identifiers.htm) of the IoT domain.
 * `state` - The current state of the digital twin adapter.
 * `system_tags` - System tags for this resource. Each key is predefined and scoped to a namespace.  Example: `{"orcl-cloud.free-tier-retained": "true"}` 

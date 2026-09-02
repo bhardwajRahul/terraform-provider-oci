@@ -33,6 +33,7 @@ import (
 	tf_cloud_bridge "github.com/oracle/terraform-provider-oci/internal/service/cloud_bridge"
 	tf_cloud_guard "github.com/oracle/terraform-provider-oci/internal/service/cloud_guard"
 	tf_cloud_migrations "github.com/oracle/terraform-provider-oci/internal/service/cloud_migrations"
+	tf_cluster_health "github.com/oracle/terraform-provider-oci/internal/service/cluster_health"
 	tf_cluster_placement_groups "github.com/oracle/terraform-provider-oci/internal/service/cluster_placement_groups"
 	tf_compute_cloud_at_customer "github.com/oracle/terraform-provider-oci/internal/service/compute_cloud_at_customer"
 	tf_computeinstanceagent "github.com/oracle/terraform-provider-oci/internal/service/computeinstanceagent"
@@ -61,7 +62,6 @@ import (
 	tf_devops "github.com/oracle/terraform-provider-oci/internal/service/devops"
 	tf_dif "github.com/oracle/terraform-provider-oci/internal/service/dif"
 	tf_disaster_recovery "github.com/oracle/terraform-provider-oci/internal/service/disaster_recovery"
-	tf_distributed_database "github.com/oracle/terraform-provider-oci/internal/service/distributed_database"
 	tf_dns "github.com/oracle/terraform-provider-oci/internal/service/dns"
 	tf_email "github.com/oracle/terraform-provider-oci/internal/service/email"
 	tf_events "github.com/oracle/terraform-provider-oci/internal/service/events"
@@ -236,6 +236,9 @@ func init() {
 	if common.CheckForEnabledServices("cloudmigrations") {
 		tf_cloud_migrations.RegisterDatasource()
 	}
+	if common.CheckForEnabledServices("clusterhealth") {
+		tf_cluster_health.RegisterDatasource()
+	}
 	if common.CheckForEnabledServices("clusterplacementgroups") {
 		tf_cluster_placement_groups.RegisterDatasource()
 	}
@@ -322,9 +325,6 @@ func init() {
 	}
 	if common.CheckForEnabledServices("disasterrecovery") {
 		tf_disaster_recovery.RegisterDatasource()
-	}
-	if common.CheckForEnabledServices("distributeddatabase") {
-		tf_distributed_database.RegisterDatasource()
 	}
 	if common.CheckForEnabledServices("dns") {
 		tf_dns.RegisterDatasource()

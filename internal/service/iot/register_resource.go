@@ -16,4 +16,8 @@ func RegisterResource() {
 	tfresource.RegisterResource("oci_iot_iot_domain_configure_data_access", IotIotDomainConfigureDataAccessResource())
 	tfresource.RegisterResource("oci_iot_iot_domain_group", IotIotDomainGroupResource())
 	tfresource.RegisterResource("oci_iot_iot_domain_group_configure_data_access", IotIotDomainGroupConfigureDataAccessResource())
+	tfresource.RegisterResource("oci_iot_iot_flow_runtime", IotIotFlowRuntimeResource())
+	tfresource.RegisterResource("oci_iot_iot_flow_runtime_activate", IotIotFlowRuntimeActivateResource())
+	tfresource.RegisterResource("oci_iot_iot_flow_runtime_deactivate", IotIotFlowRuntimeDeactivateResource())
+	tfresource.RegisterResource("oci_iot_iot_flow_runtime_flow", IotIotFlowRuntimeFlowResource())
 }

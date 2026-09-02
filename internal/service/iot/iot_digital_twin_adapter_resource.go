@@ -165,6 +165,11 @@ func IotDigitalTwinAdapterResource() *schema.Resource {
 						},
 
 						// Optional
+						"content_root": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
+						},
 						"description": {
 							Type:     schema.TypeString,
 							Optional: true,
@@ -204,6 +209,11 @@ func IotDigitalTwinAdapterResource() *schema.Resource {
 									// Computed
 								},
 							},
+						},
+						"target": {
+							Type:     schema.TypeString,
+							Optional: true,
+							Computed: true,
 						},
 
 						// Computed
@@ -630,6 +640,11 @@ func (s *IotDigitalTwinAdapterResourceCrud) mapToDigitalTwinAdapterInboundRoute(
 		result.Condition = &tmp
 	}
 
+	if contentRoot, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "content_root")); ok {
+		tmp := contentRoot.(string)
+		result.ContentRoot = &tmp
+	}
+
 	if description, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "description")); ok {
 		tmp := description.(string)
 		result.Description = &tmp
@@ -650,6 +665,11 @@ func (s *IotDigitalTwinAdapterResourceCrud) mapToDigitalTwinAdapterInboundRoute(
 		}
 	}
 
+	if target, ok := s.D.GetOkExists(fmt.Sprintf(fieldKeyFormat, "target")); ok {
+		tmp := target.(string)
+		result.Target = &tmp
+	}
+
 	return result, nil
 }
 
@@ -658,6 +678,10 @@ func DigitalTwinAdapterInboundRouteToMap(obj oci_iot.DigitalTwinAdapterInboundRo
 
 	if obj.Condition != nil {
 		result["condition"] = string(*obj.Condition)
+	}
+
+	if obj.ContentRoot != nil {
+		result["content_root"] = string(*obj.ContentRoot)
 	}
 
 	if obj.Description != nil {
@@ -672,6 +696,10 @@ func DigitalTwinAdapterInboundRouteToMap(obj oci_iot.DigitalTwinAdapterInboundRo
 			referencePayloadArray = append(referencePayloadArray, referencePayloadMap)
 		}
 		result["reference_payload"] = referencePayloadArray
+	}
+
+	if obj.Target != nil {
+		result["target"] = string(*obj.Target)
 	}
 
 	return result

@@ -298,7 +298,6 @@ resource "tls_private_key" "example" {
 }
 
 resource "tls_self_signed_cert" "example" {
-  key_algorithm   = "ECDSA"
   private_key_pem = tls_private_key.example.private_key_pem
 
   subject {
@@ -403,4 +402,3 @@ resource "oci_database_autonomous_database" "test_autonomous_database" {
   license_model           = "LICENSE_INCLUDED"
   is_free_tier            = "true"
 }
-

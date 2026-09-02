@@ -470,14 +470,6 @@ func DatabaseDbSystemResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Required: true,
 			},
-			"ssh_public_keys": {
-				Type:     schema.TypeSet,
-				Required: true,
-				Set:      tfresource.LiteralTypeHashCodeForSets,
-				Elem: &schema.Schema{
-					Type: schema.TypeString,
-				},
-			},
 			"subnet_id": {
 				Type:     schema.TypeString,
 				Required: true,
@@ -828,6 +820,15 @@ func DatabaseDbSystemResource() *schema.Resource {
 				Optional: true,
 				Computed: true,
 				ForceNew: true,
+			},
+			"ssh_public_keys": {
+				Type:     schema.TypeSet,
+				Optional: true,
+				Computed: true,
+				Set:      tfresource.LiteralTypeHashCodeForSets,
+				Elem: &schema.Schema{
+					Type: schema.TypeString,
+				},
 			},
 			"storage_volume_performance_mode": {
 				Type:     schema.TypeString,

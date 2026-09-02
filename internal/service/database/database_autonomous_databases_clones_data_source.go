@@ -113,6 +113,11 @@ func DatabaseAutonomousDatabasesClonesDataSource() *schema.Resource {
 									// Optional
 
 									// Computed
+									"availability_domain": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+									},
 									"day_of_week": {
 										Type:     schema.TypeList,
 										Computed: true,
@@ -129,6 +134,11 @@ func DatabaseAutonomousDatabasesClonesDataSource() *schema.Resource {
 												},
 											},
 										},
+									},
+									"is_maintenance_window_change_scheduled": {
+										Type:     schema.TypeBool,
+										Computed: true,
+										Optional: true,
 									},
 									"maintenance_end_time": {
 										Type:     schema.TypeString,
@@ -1099,6 +1109,60 @@ func DatabaseAutonomousDatabasesClonesDataSource() *schema.Resource {
 							Type:     schema.TypeString,
 							Computed: true,
 						},
+						"scheduled_maintenance_window": {
+							Type:     schema.TypeList,
+							Optional: true,
+							Computed: true,
+							MaxItems: 1,
+							MinItems: 1,
+							Elem: &schema.Resource{
+								Schema: map[string]*schema.Schema{
+									// Required
+
+									// Optional
+									"day_of_week": {
+										Type:     schema.TypeList,
+										Optional: true,
+										Computed: true,
+										Elem: &schema.Resource{
+											Schema: map[string]*schema.Schema{
+												// Required
+												"name": {
+													Type:     schema.TypeString,
+													Required: true,
+												},
+
+												// Optional
+
+												// Computed
+											},
+										},
+									},
+									"availability_domain": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+									},
+									"is_maintenance_window_change_scheduled": {
+										Type:     schema.TypeBool,
+										Optional: true,
+										Computed: true,
+									},
+									"maintenance_end_time": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+									},
+									"maintenance_start_time": {
+										Type:     schema.TypeString,
+										Optional: true,
+										Computed: true,
+									},
+
+									// Computed
+								},
+							},
+						},
 						"scheduled_operations": {
 							Type:     schema.TypeList,
 							Computed: true,
@@ -1320,6 +1384,11 @@ func DatabaseAutonomousDatabasesClonesDataSource() *schema.Resource {
 						},
 						"time_scheduled_db_version_upgrade": {
 							Type:     schema.TypeString,
+							Computed: true,
+						},
+						"time_scheduled_maintenance_window_update": {
+							Type:     schema.TypeString,
+							Optional: true,
 							Computed: true,
 						},
 						"time_undeleted": {
@@ -1897,6 +1966,10 @@ func (s *DatabaseAutonomousDatabasesClonesDataSourceCrud) SetData() error {
 
 		autonomousDatabasesClone["role"] = r.Role
 
+		if r.ScheduledMaintenanceWindow != nil {
+			autonomousDatabasesClone["scheduled_maintenance_window"] = []interface{}{AutonomousDatabaseMaintenanceWindowSummaryToMap(r.ScheduledMaintenanceWindow)}
+		}
+
 		scheduledOperations := []interface{}{}
 		for _, item := range r.ScheduledOperations {
 			scheduledOperations = append(scheduledOperations, ScheduledOperationDetailsToMap(item))
@@ -2023,6 +2096,10 @@ func (s *DatabaseAutonomousDatabasesClonesDataSourceCrud) SetData() error {
 
 		if r.TimeScheduledDbVersionUpgrade != nil {
 			autonomousDatabasesClone["time_scheduled_db_version_upgrade"] = r.TimeScheduledDbVersionUpgrade.String()
+		}
+
+		if r.TimeScheduledMaintenanceWindowUpdate != nil {
+			autonomousDatabasesClone["time_scheduled_maintenance_window_update"] = r.TimeScheduledMaintenanceWindowUpdate.Format(time.RFC3339)
 		}
 
 		if r.TimeUndeleted != nil {

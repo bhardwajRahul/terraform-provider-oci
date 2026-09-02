@@ -71,7 +71,7 @@ func (s *IotDigitalTwinInstanceDataSourceCrud) SetData() error {
 		s.D.Set("auth_id", *s.Res.AuthId)
 	}
 
-	s.D.Set("connectivity_type", s.Res.ConnectivityType)
+	s.D.Set("connectivity_type", string(s.Res.ConnectivityType))
 
 	if s.Res.DefinedTags != nil {
 		s.D.Set("defined_tags", tfresource.DefinedTagsToMap(s.Res.DefinedTags))

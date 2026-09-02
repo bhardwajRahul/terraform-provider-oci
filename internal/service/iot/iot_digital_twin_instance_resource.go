@@ -42,7 +42,6 @@ func IotDigitalTwinInstanceResource() *schema.Resource {
 				Type:     schema.TypeString,
 				Optional: true,
 				Computed: true,
-				ForceNew: true,
 			},
 			"defined_tags": {
 				Type:             schema.TypeMap,
@@ -290,6 +289,10 @@ func (s *IotDigitalTwinInstanceResourceCrud) UpdateWithContext(ctx context.Conte
 		request.AuthId = &tmp
 	}
 
+	if connectivityType, ok := s.D.GetOkExists("connectivity_type"); ok {
+		request.ConnectivityType = oci_iot.DigitalTwinInstanceConnectivityTypeEnum(connectivityType.(string))
+	}
+
 	if definedTags, ok := s.D.GetOkExists("defined_tags"); ok {
 		convertedDefinedTags, err := tfresource.MapToDefinedTags(definedTags.(map[string]interface{}))
 		if err != nil {
@@ -376,7 +379,7 @@ func (s *IotDigitalTwinInstanceResourceCrud) SetData() error {
 		s.D.Set("auth_id", *s.Res.AuthId)
 	}
 
-	s.D.Set("connectivity_type", s.Res.ConnectivityType)
+	s.D.Set("connectivity_type", string(s.Res.ConnectivityType))
 
 	if s.Res.DefinedTags != nil {
 		s.D.Set("defined_tags", tfresource.DefinedTagsToMap(s.Res.DefinedTags))
