@@ -7,7 +7,7 @@ import (
 	"log"
 )
 
-const Version = "8.30.0"
+const Version = "9.0.0"
 const ReleaseDate = "2026-09-02"
 
 func PrintVersion() {
